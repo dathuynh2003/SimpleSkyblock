@@ -1,0 +1,75 @@
+# NPC Trading Configuration
+# Format:
+# npcs:
+#   npc_id:
+#     display-name: "§6§lNPC Name"
+#     profession: TOOLSMITH/WEAPONSMITH/ARMORER...
+#     level: 1-5
+#     trades:
+#       trade_id:
+#         gui-slot: slot_number
+#         requirements:
+#           - "MATERIAL:amount"
+#           - "custom:item_id"
+#         reward: "custom:item_id" or "MATERIAL:amount"
+
+npcs:
+  thorentanthu:
+    display-name: "§6§lThợ Rèn Tân Thủ"
+    profession: TOOLSMITH
+    level: 5
+    trades:
+      trade1:
+        gui-slot: 14
+        requirements:
+          - "COBBLESTONE:128"
+        reward: "custom:pickaxe_tier1"
+
+      trade2:
+        gui-slot: 23
+        requirements:
+          - "custom:pickaxe_tier1"
+          - "COBBLESTONE:320"
+        reward: "custom:pickaxe_tier2"
+
+      trade3:
+        gui-slot: 32
+        requirements:
+          - "custom:pickaxe_tier2"
+          - "COBBLESTONE:640"
+        reward: "custom:pickaxe_tier3"
+
+  thorenvukhi:
+    display-name: "§c§lThợ Rèn Vũ Khí"
+    profession: WEAPONSMITH
+    level: 5
+    trades:
+      sword:
+        gui-slot: 14
+        requirements:
+          - "DIAMOND:64"
+        reward: "custom:god_sword"
+
+      pickaxe:
+        gui-slot: 23
+        requirements:
+          - "EMERALD:64"
+        reward: "custom:god_pickaxe"
+
+      armor:
+        gui-slot: 32
+        requirements:
+          - "NETHERITE_INGOT:64"
+        reward: "custom:god_chestplate"
+
+  # Ví dụ NPC khác
+  thieunang:
+    display-name: "§e§lThiện Nàng"
+    profession: CLERIC
+    level: 5
+    trades:
+      heal_potion:
+        gui-slot: 14
+        requirements:
+          - "GOLD_INGOT:16"
+        reward: "POTION:1" # Có thể custom thêm

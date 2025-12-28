@@ -1,0 +1,21 @@
+name: SimpleSkyblock
+version: 1.0
+main: com.dathuynh.simpleskyblock.Main
+api-version: 1.20
+author: DatHuynh
+commands:
+  is:
+    description: Island management commands
+    usage: /<command> [create|home|delete]
+    aliases: [ island ]
+  spawn:
+    description: Teleport to spawn lobby
+    usage: /<command>
+  npc:
+    description: NPC management
+    usage: /<command> spawn
+  restart:
+    description: Restart server
+    usage: /<command>
+    permission: simpleskyblock.restart
+    permission-message: "§cChỉ admin mới có thể restart server!"

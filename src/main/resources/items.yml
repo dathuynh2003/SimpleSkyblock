@@ -1,0 +1,107 @@
+# Custom Items Configuration
+# Format:
+# items:
+#   item_id:
+#     material: MATERIAL_NAME
+#     display-name: "§cDisplay Name"
+#     lore:
+#       - "§7Line 1"
+#       - "§7Line 2"
+#     unbreakable: true/false
+#     enchantments:
+#       ENCHANT_NAME: level
+#     attributes:
+#       damage: 100.0
+#       attack-speed: 2.0
+#       armor: 20.0
+#       max-health: 40.0
+#       knockback-resistance: 1.0
+#       movement-speed: 0.5
+
+items:
+  # Cúp Kim Cương tiers
+  pickaxe_tier1:
+    material: DIAMOND_PICKAXE
+    display-name: "§b§lCúp KC Siêu Tốc I"
+    lore:
+      - "§7Đào nhanh hơn 30%"
+      - ""
+      - "§eClick để đổi!"
+    enchantments:
+      DIG_SPEED: 1
+
+  pickaxe_tier2:
+    material: DIAMOND_PICKAXE
+    display-name: "§b§lCúp KC Siêu Tốc II"
+    lore:
+      - "§7Đào nhanh hơn 69%"
+      - ""
+      - "§eClick để đổi!"
+    enchantments:
+      DIG_SPEED: 2
+
+  pickaxe_tier3:
+    material: DIAMOND_PICKAXE
+    display-name: "§b§lCúp KC Siêu Tốc III"
+    lore:
+      - "§7Đào nhanh hơn 120%"
+      - "§7Độ bền cao: §e+500"
+      - ""
+      - "§eClick để đổi!"
+    enchantments:
+      DIG_SPEED: 3
+      DURABILITY: 2
+
+  # Vũ khí siêu mạnh
+  god_sword:
+    material: DIAMOND_SWORD
+    display-name: "§c§lKiếm Bá Chủ"
+    lore:
+      - "§7Sát thương: §c+100"
+      - "§7Tốc độ: §e+50%"
+      - ""
+      - "§cMột nhát chém hủy diệt!"
+      - ""
+      - "§eClick để đổi!"
+    unbreakable: true
+    enchantments:
+      FIRE_ASPECT: 5
+      KNOCKBACK: 3
+    attributes:
+      damage: 100.0
+      attack-speed: 2.0
+
+  god_pickaxe:
+    material: NETHERITE_PICKAXE
+    display-name: "§d§lCúp Thần Thánh"
+    lore:
+      - "§7Hiệu quả: §aX"
+      - "§7Độ bền: §e∞ Vô Hạn"
+      - "§7May mắn: §bIII"
+      - ""
+      - "§dĐào mọi thứ trong 1 nốt nhạc!"
+      - ""
+      - "§eClick để đổi!"
+    unbreakable: true
+    enchantments:
+      DIG_SPEED: 10
+      LOOT_BONUS_BLOCKS: 3
+
+  god_chestplate:
+    material: NETHERITE_CHESTPLATE
+    display-name: "§6§lGiáp Bất Tử"
+    lore:
+      - "§7Giáp: §b+100"
+      - "§7Máu: §c+40 HP"
+      - "§7Chống văng: §e100%"
+      - ""
+      - "§6Trở thành bất khả xâm phạm!"
+      - ""
+      - "§eClick để đổi!"
+    unbreakable: true
+    enchantments:
+      PROTECTION_ENVIRONMENTAL: 10
+    attributes:
+      armor: 100.0
+      max-health: 40.0
+      knockback-resistance: 1.0

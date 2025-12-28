@@ -1,0 +1,7 @@
+# NPC Data Storage
+# Format:
+# npcs:
+#   <uuid>:
+#     type: <npc_type>
+
+npcs: { }
