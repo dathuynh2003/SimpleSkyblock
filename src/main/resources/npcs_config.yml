@@ -73,3 +73,223 @@ npcs:
         requirements:
           - "GOLD_INGOT:16"
         reward: "POTION:1" # Có thể custom thêm
+
+  old_farmer:
+    display-name: "§6§lNÔNG DÂN CŨ"
+    profession: FARMER
+    level: 5
+
+    trades:
+      wheat_to_birch:
+        gui-slot: 20
+        requirements:
+          - "WHEAT:64"
+        reward: "BIRCH_SAPLING:1"
+
+      potato_to_spruce:
+        gui-slot: 22
+        requirements:
+          - "POTATO:128"
+        reward: "SPRUCE_SAPLING:1"
+
+      carrot_to_apple:
+        gui-slot: 24
+        requirements:
+          - "CARROT:256"
+        reward: "APPLE:1"
+
+      melon_to_beetroot:
+        gui-slot: 31
+        requirements:
+          - "MELON_SLICE:512"
+        reward: "BEETROOT:3"
+
+  patient_miner:
+    display-name: "§7§lTHỢ MỎ KIÊN NHẪN"
+    profession: MASON
+    level: 5
+
+    trades:
+      cobble_to_sand:
+        gui-slot: 20
+        requirements:
+          - "COBBLESTONE:256"
+        reward: "SAND:4"
+
+      cobble_to_gravel:
+        gui-slot: 22
+        requirements:
+          - "COBBLESTONE:512"
+        reward: "GRAVEL:8"
+
+      cobble_to_stone:
+        gui-slot: 24
+        requirements:
+          - "COBBLESTONE:1024"
+        reward: "STONE:16"
+
+      cobble_to_calcite:
+        gui-slot: 31
+        requirements:
+          - "COBBLESTONE:2048"
+        reward: "CALCITE:1"
+
+  night_hunter:
+    display-name: "§5§lTHỢ SĂN ĐÊM"
+    profession: "NITWIT"
+    level: 5
+
+    trades:
+      flesh_to_chicken:
+        gui-slot: 20
+        requirements:
+          - "ROTTEN_FLESH:384"
+        reward: "CHICKEN_SPAWN_EGG:1"
+
+      bone_to_sheep:
+        gui-slot: 22
+        requirements:
+          - BONE:192
+        reward: "SHEEP_SPAWN_EGG:1"
+
+      flesh_bone_to_cow:
+        gui-slot: 24
+        requirements:
+          - "ROTTEN_FLESH:576"
+          - "BONE:288"
+        reward: "COW_SPAWN_EGG:1"
+
+      string_to_cat:
+        gui-slot: 31
+        requirements:
+          - "STRING:768"
+        reward: "CAT_SPAWN_EGG:1"
+
+  nether_smith:
+    display-name: "§c§lTHỢ RÈN NETHER"
+    profession: "TOOLSMITH"
+    level: 5
+
+    trades:
+      coal_to_glowstone:
+        gui-slot: 20
+        requirements:
+          - "COAL:64"
+        reward: "GLOWSTONE_DUST:4"
+
+      blaze_to_wart:
+        gui-slot: 22
+        requirements:
+          - "BLAZE_ROD:32"
+        reward: "NETHER_WART:8"
+
+      tear_to_soulsand:
+        gui-slot: 24
+        requirements:
+          - "GHAST_TEAR:1"
+        reward: "SOUL_SAND:16"
+
+      netherrack_to_brick:
+        gui-slot: 31
+        requirements:
+          - "NETHERRACK:128"
+        reward: "NETHER_BRICK:4"
+
+  forest_keeper:
+    display-name: "§2§lTHỢ GỖ LÃO THÀNH"
+    profession: "LUMBERJACK"
+    level: 5
+
+    trades:
+      oak_to_jungle:
+        gui-slot: 20
+        requirements:
+          - "OAK_LOG:512"
+        reward: "JUNGLE_SAPLING:1"
+
+      birch_to_acacia:
+        gui-slot: 22
+        requirements:
+          - "BIRCH_LOG:256"
+        reward: "ACACIA_SAPLING:1"
+
+      spruce_to_bark:
+        gui-slot: 24
+        requirements:
+          - "SPRUCE_LOG:128"
+        reward: "STRIPPED_SPRUCE_LOG:4"
+
+      wood_to_bamboo:
+        gui-slot: 31
+        requirements:
+          - "OAK_LOG:64"
+        reward: "BAMBOO:4"
+
+  wandering_merchant:
+    display-name: "§e§lTHƯƠNG GIA LANG THANG"
+    profession: "CLERIC"
+    level: 5
+
+    trades:
+      end_items:
+        gui-slot: 20
+        requirements:
+          - "ENDER_PEARL:128"
+          - "BLAZE_POWDER:64"
+        reward: "ENDER_EYE:8"
+
+      crops_to_villager:
+        gui-slot: 22
+        requirements:
+          - "WHEAT:256"
+          - "CARROT:128"
+          - "POTATO:64"
+        reward: "VILLAGER_SPAWN_EGG:1"
+
+      metal_to_redstone:
+        gui-slot: 24
+        requirements:
+          - "IRON_INGOT:384"
+          - "GOLD_INGOT:192"
+        reward: "REDSTONE:16"
+
+      mob_to_lapis:
+        gui-slot: 31
+        requirements:
+          - "ROTTEN_FLESH:512"
+          - "STRING:256"
+        reward: "LAPIS_LAZULI:8"
+
+  shipwreck_sailor:
+    display-name: "§9§lTHỦY THỦ BỊ ĐẮM"
+    profession: FISHERMAN
+    level: 5
+
+    trades:
+      sand_to_ice:
+        gui-slot: 20
+        requirements:
+          - "SAND:128"
+        reward: "ICE:1"
+
+      string_to_rod:
+        gui-slot: 22
+        requirements:
+          - "STRING:64"
+          - "STICK:32"
+        reward: "FISHING_ROD:1"
+
+      rod_to_kelp:
+        gui-slot: 24
+        requirements:
+          - "FISHING_ROD:1"
+          - "COD:32"
+        reward: "KELP:8"
+
+      sand_gravel_to_clay:
+        gui-slot: 31
+        requirements:
+          - "SAND:256"
+          - "GRAVEL:128"
+        reward: "CLAY_BALL:4"
+
