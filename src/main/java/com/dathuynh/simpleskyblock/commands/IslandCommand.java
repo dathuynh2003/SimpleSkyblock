@@ -1,33 +1,25 @@
 package com.dathuynh.simpleskyblock.commands;
 
 import com.dathuynh.simpleskyblock.Main;
+import com.dathuynh.simpleskyblock.managers.IslandManager;
+import com.dathuynh.simpleskyblock.models.Island;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.UUID;
 
 public class IslandCommand implements CommandExecutor {
 
     private Main plugin;
-    private HashMap<UUID, Location> islands = new HashMap<>();
-    private HashMap<UUID, Long> islandCreationTime = new HashMap<>();
+    private IslandManager islandManager;
 
-    // Cấu hình
-    private static final int ISLAND_SPACING = 250; // Khoảng cách giữa các đảo (đủ cho 100x100 + buffer)
-    private static final int ISLAND_RADIUS = 50; // Bán kính island (100x100 = radius 50)
-    private static final long COOLDOWN_DAYS = 7; // 7 ngày
-    private static final long COOLDOWN_MS = COOLDOWN_DAYS * 24 * 60 * 60 * 1000L;
-
-    public IslandCommand(Main plugin) {
+    public IslandCommand(Main plugin, IslandManager islandManager) {
         this.plugin = plugin;
+        this.islandManager = islandManager;
     }
 
     @Override
@@ -40,203 +32,174 @@ public class IslandCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        if (args.length == 0) {
-            player.sendMessage("§6=== SimpleSkyblock Commands ===");
-            player.sendMessage("§e/spawn §7- Về spawn lobby");
-            player.sendMessage("§e/is create §7- Tạo đảo mới");
-            player.sendMessage("§e/is home §7- Về đảo của bạn");
-            player.sendMessage("§e/is delete §7- Xóa đảo (7 ngày cooldown)");
-            player.sendMessage("§e/is info §7- Thông tin đảo");
+        // /is hoặc /is home - về đảo
+        if (args.length == 0 || args[0].equalsIgnoreCase("home")) {
+            Location home = islandManager.getIslandHome(player.getUniqueId());
+            if (home == null) {
+                showHelp(player);
+                return true;
+            }
+
+            player.teleport(home);
+            player.sendMessage("§aĐã dịch chuyển về đảo!");
             return true;
         }
 
-        if (args[0].equalsIgnoreCase("create")) {
-            createIsland(player);
-            return true;
+        switch (args[0].toLowerCase()) {
+            case "create":
+                handleCreate(player);
+                break;
+            case "delete":
+                handleDelete(player);
+                break;
+            case "info":
+                handleInfo(player);
+                break;
+            case "invite":
+                handleInvite(player, args);
+                break;
+            case "accept":
+                handleAccept(player, args);
+                break;
+            case "leave":
+                handleLeave(player);
+                break;
+            default:
+                showHelp(player);
         }
 
-        if (args[0].equalsIgnoreCase("home")) {
-            teleportHome(player);
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("delete")) {
-            deleteIsland(player);
-            return true;
-        }
-
-        if (args[0].equalsIgnoreCase("info")) {
-            showIslandInfo(player);
-            return true;
-        }
-
-        player.sendMessage("§cLệnh không hợp lệ! Dùng /is để xem danh sách.");
         return true;
     }
 
-    private void createIsland(Player player) {
-        UUID uuid = player.getUniqueId();
+    private void showHelp(Player player) {
+        player.sendMessage("§6=== SimpleSkyblock Commands ===");
+        player.sendMessage("§e/is §7hoặc §e/is home §7- Về đảo của bạn");
+        player.sendMessage("§e/is create §7- Tạo đảo mới");
+        player.sendMessage("§e/is delete §7- Xóa đảo (24h cooldown)");
+        player.sendMessage("§e/is info §7- Thông tin đảo");
+        player.sendMessage("§e/is invite <tên> §7- Mời người chơi vào đảo");
+        player.sendMessage("§e/is accept <tên> §7- Chấp nhận lời mời");
+        player.sendMessage("§e/is leave §7- Rời khỏi đảo (chỉ member)");
+    }
 
-        // Kiểm tra đã có đảo chưa
-        if (islands.containsKey(uuid)) {
-            player.sendMessage("§cBạn đã có đảo rồi! Dùng /is delete để xóa đảo cũ.");
+    private void handleLeave(Player player) {
+        boolean success = islandManager.leaveIsland(player.getUniqueId());
+
+        if (!success) {
+            player.sendMessage("§cBạn không thể rời đảo! (Chủ đảo không thể rời hoặc bạn chưa có đảo)");
             return;
         }
 
-        // Kiểm tra cooldown 7 ngày
-        if (islandCreationTime.containsKey(uuid)) {
-            long timeSinceLastCreation = System.currentTimeMillis() - islandCreationTime.get(uuid);
-            if (timeSinceLastCreation < COOLDOWN_MS) {
-                long remainingTime = COOLDOWN_MS - timeSinceLastCreation;
-                long daysLeft = remainingTime / (24 * 60 * 60 * 1000);
-                long hoursLeft = (remainingTime % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000);
+        player.sendMessage("§aĐã rời khỏi đảo!");
+        player.performCommand("spawn");
+    }
 
-                player.sendMessage("§cBạn phải đợi " + daysLeft + " ngày " + hoursLeft + " giờ nữa để tạo đảo mới!");
-                return;
+    private void handleCreate(Player player) {
+        boolean success = islandManager.createIsland(player.getUniqueId(), player.getName());
+
+        if (!success) {
+            long cooldown = islandManager.getRemainingCooldown(player.getUniqueId());
+            if (cooldown > 0) {
+                long hoursLeft = cooldown / (60 * 60 * 1000);
+                player.sendMessage("§cBạn phải đợi " + hoursLeft + " giờ nữa để tạo đảo mới!");
+            } else {
+                player.sendMessage("§cBạn đã có đảo rồi! Dùng /is delete để xóa đảo cũ.");
             }
+            return;
         }
 
-        World world = Bukkit.getWorld("world");
-        int islandNumber = islands.size() + 1;
-        int x = islandNumber * ISLAND_SPACING;
-        Location islandLoc = new Location(world, x + 0.5, 100, 0.5);
-
-        // Tạo platform 5x5
-        for (int i = -2; i <= 2; i++) {
-            for (int j = -2; j <= 2; j++) {
-                world.getBlockAt(x + i, 99, j).setType(Material.DIRT);
-            }
-        }
-
-        world.getBlockAt(x, 99, 0).setType(Material.GRASS_BLOCK);
-
-        // Spawn cây trưởng thành
-        Location treeLoc = new Location(world, x, 100, 0);
-        world.generateTree(treeLoc, org.bukkit.TreeType.TREE);
-
-        // Tạo rương với items
-        Location chestLoc = new Location(world, x + 2, 100, 0);
-        world.getBlockAt(chestLoc).setType(Material.CHEST);
-
-        org.bukkit.block.Chest chest = (org.bukkit.block.Chest) world.getBlockAt(chestLoc).getState();
-        org.bukkit.inventory.Inventory chestInv = chest.getInventory();
-
-        chestInv.addItem(new ItemStack(Material.ICE, 2));
-        chestInv.addItem(new ItemStack(Material.LAVA_BUCKET, 1));
-        chestInv.addItem(new ItemStack(Material.MELON_SEEDS, 1));
-        chestInv.addItem(new ItemStack(Material.PUMPKIN_SEEDS, 1));
-        chestInv.addItem(new ItemStack(Material.SUGAR_CANE, 2));
-        chestInv.addItem(new ItemStack(Material.BONE_MEAL, 8));
-        chestInv.addItem(new ItemStack(Material.BREAD, 5));
-
-        islands.put(uuid, islandLoc);
-        islandCreationTime.put(uuid, System.currentTimeMillis());
-
-        player.teleport(islandLoc);
+        Location home = islandManager.getIslandHome(player.getUniqueId());
+        player.teleport(home);
         player.sendMessage("§aĐảo của bạn đã được tạo!");
         player.sendMessage("§eKiểm tra rương để nhận items khởi đầu!");
         player.sendMessage("§7Giới hạn xây dựng: 100x100 blocks");
     }
 
-    private void teleportHome(Player player) {
-        UUID uuid = player.getUniqueId();
+    private void handleDelete(Player player) {
+        boolean success = islandManager.deleteIsland(player.getUniqueId());
 
-        if (!islands.containsKey(uuid)) {
-            player.sendMessage("§cBạn chưa có đảo! Dùng /is create để tạo.");
+        if (!success) {
+            player.sendMessage("§cBạn không có đảo hoặc không phải chủ đảo!");
             return;
         }
 
-        player.teleport(islands.get(uuid));
-        player.sendMessage("§aĐã dịch chuyển về đảo!");
-    }
-
-    private void deleteIsland(Player player) {
-        UUID uuid = player.getUniqueId();
-
-        if (!islands.containsKey(uuid)) {
-            player.sendMessage("§cBạn không có đảo để xóa!");
-            return;
-        }
-
-        Location islandCenter = islands.get(uuid);
-        World world = islandCenter.getWorld();
-        int centerX = islandCenter.getBlockX();
-        int centerZ = islandCenter.getBlockZ();
-
-        player.sendMessage("§eĐang xóa đảo...");
-
-        // Xóa toàn bộ blocks trong vùng 100x100, từ y=0 đến y=255
-        int blocksCleared = 0;
-        for (int x = centerX - ISLAND_RADIUS; x <= centerX + ISLAND_RADIUS; x++) {
-            for (int z = centerZ - ISLAND_RADIUS; z <= centerZ + ISLAND_RADIUS; z++) {
-                for (int y = 0; y <= 255; y++) {
-                    if (world.getBlockAt(x, y, z).getType() != Material.AIR) {
-                        world.getBlockAt(x, y, z).setType(Material.AIR);
-                        blocksCleared++;
-                    }
-                }
-            }
-        }
-
-        islands.remove(uuid);
-        // Không xóa islandCreationTime để giữ cooldown
-
-        player.sendMessage("§aĐã xóa đảo của bạn! (" + blocksCleared + " blocks)");
-        player.sendMessage("§eĐợi 7 ngày để tạo đảo mới.");
-
-        // Teleport về spawn
+        player.sendMessage("§aĐã xóa đảo của bạn!");
+        player.sendMessage("§eĐợi 24 giờ để tạo đảo mới.");
         player.performCommand("spawn");
     }
 
-    private void showIslandInfo(Player player) {
-        UUID uuid = player.getUniqueId();
+    private void handleInfo(Player player) {
+        Island island = islandManager.getIsland(player.getUniqueId());
 
-        if (!islands.containsKey(uuid)) {
+        if (island == null) {
             player.sendMessage("§cBạn chưa có đảo!");
             return;
         }
 
-        Location islandLoc = islands.get(uuid);
+        Location loc = island.getLocation();
+        String ownerName = Bukkit.getOfflinePlayer(island.getOwner()).getName();
+
         player.sendMessage("§6=== Thông tin đảo ===");
-        player.sendMessage("§eTọa độ: §f" + islandLoc.getBlockX() + ", " + islandLoc.getBlockY() + ", " + islandLoc.getBlockZ());
-        player.sendMessage("§eGiới hạn xây dựng: §f100x100 blocks");
+        player.sendMessage("§eChủ đảo: §f" + ownerName);
+        player.sendMessage("§eTọa độ: §f" + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ());
+        player.sendMessage("§eThành viên: §f" + island.getMembers().size());
 
-        if (islandCreationTime.containsKey(uuid)) {
-            long daysSinceCreation = (System.currentTimeMillis() - islandCreationTime.get(uuid)) / (24 * 60 * 60 * 1000);
-            player.sendMessage("§eTuổi đảo: §f" + daysSinceCreation + " ngày");
-        }
+        long daysSince = (System.currentTimeMillis() - island.getCreatedTime()) / (24 * 60 * 60 * 1000);
+        player.sendMessage("§eTuổi đảo: §f" + daysSince + " ngày");
+        player.sendMessage("§eGiới hạn: §f100x100 blocks");
     }
 
-    // Method để check xem location có nằm trong island của player không
-    public boolean isInOwnIsland(Player player, Location loc) {
-        UUID uuid = player.getUniqueId();
-        if (!islands.containsKey(uuid)) {
-            return false;
+    private void handleInvite(Player player, String[] args) {
+        if (args.length < 2) {
+            player.sendMessage("§cSử dụng: /is invite <tên người chơi>");
+            return;
         }
 
-        Location islandCenter = islands.get(uuid);
-        int dx = Math.abs(loc.getBlockX() - islandCenter.getBlockX());
-        int dz = Math.abs(loc.getBlockZ() - islandCenter.getBlockZ());
-
-        return dx <= ISLAND_RADIUS && dz <= ISLAND_RADIUS;
-    }
-
-    // Method để check xem location có nằm trong island của ai đó không
-    public static boolean isInAnyIsland(Location loc, HashMap<UUID, Location> islands) {
-        for (Location islandCenter : islands.values()) {
-            if (!loc.getWorld().equals(islandCenter.getWorld())) continue;
-
-            int dx = Math.abs(loc.getBlockX() - islandCenter.getBlockX());
-            int dz = Math.abs(loc.getBlockZ() - islandCenter.getBlockZ());
-
-            if (dx <= ISLAND_RADIUS && dz <= ISLAND_RADIUS) {
-                return true;
-            }
+        Player target = Bukkit.getPlayer(args[1]);
+        if (target == null) {
+            player.sendMessage("§cNgười chơi không online!");
+            return;
         }
-        return false;
+
+        boolean success = islandManager.invitePlayer(player.getUniqueId(), target.getUniqueId());
+
+        if (!success) {
+            player.sendMessage("§cKhông thể mời! Bạn phải là chủ đảo và người được mời chưa có đảo.");
+            return;
+        }
+
+        player.sendMessage("§aĐã gửi lời mời đến " + target.getName());
+        target.sendMessage("§e" + player.getName() + " đã mời bạn vào đảo!");
+        target.sendMessage("§aDùng §f/is accept " + player.getName() + " §ađể chấp nhận");
     }
 
-    public HashMap<UUID, Location> getIslands() {
-        return islands;
+    private void handleAccept(Player player, String[] args) {
+        if (args.length < 2) {
+            player.sendMessage("§cSử dụng: /is accept <tên người mời>");
+            return;
+        }
+
+        Player inviter = Bukkit.getPlayer(args[1]);
+        if (inviter == null) {
+            player.sendMessage("§cNgười chơi không online!");
+            return;
+        }
+
+        boolean success = islandManager.acceptInvite(player.getUniqueId(), inviter.getUniqueId());
+
+        if (!success) {
+            player.sendMessage("§cKhông có lời mời từ người chơi này hoặc bạn đã có đảo!");
+            return;
+        }
+
+        player.sendMessage("§aĐã tham gia đảo của " + inviter.getName() + "!");
+        inviter.sendMessage("§e" + player.getName() + " đã tham gia đảo của bạn!");
+
+        Location home = islandManager.getIslandHome(player.getUniqueId());
+        player.teleport(home);
+    }
+
+    public IslandManager getIslandManager() {
+        return islandManager;
     }
 }

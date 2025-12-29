@@ -3,6 +3,7 @@ version: 1.0
 main: com.dathuynh.simpleskyblock.Main
 api-version: 1.20
 author: DatHuynh
+depend: [WorldEdit]
 commands:
   is:
     description: Island management commands
@@ -19,3 +20,6 @@ commands:
     usage: /<command>
     permission: simpleskyblock.restart
     permission-message: "§cChỉ admin mới có thể restart server!"
+  tp:
+    description: Teleport request commands
+    usage: /<command> <player> hoặc /<command> accept <player>

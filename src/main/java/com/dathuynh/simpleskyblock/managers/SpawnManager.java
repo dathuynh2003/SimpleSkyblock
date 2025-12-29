@@ -56,9 +56,6 @@ public class SpawnManager {
                 world.getBlockAt(x, 98, z).setType(Material.IRON_BLOCK);
             }
         }
-
-        // Đặt beacon ở giữa
-        world.getBlockAt(0, 100, 0).setType(Material.BEACON);
     }
 
     public Location getSpawnLocation() {
