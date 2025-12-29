@@ -195,35 +195,35 @@ npcs:
           - "NETHERRACK:128"
         reward: "NETHER_BRICK:4"
 
-  forest_keeper:
-    display-name: "§2§lTHỢ GỖ LÃO THÀNH"
-    profession: "LUMBERJACK"
-    level: 5
-
-    trades:
-      oak_to_jungle:
-        gui-slot: 20
-        requirements:
-          - "OAK_LOG:512"
-        reward: "JUNGLE_SAPLING:1"
-
-      birch_to_acacia:
-        gui-slot: 22
-        requirements:
-          - "BIRCH_LOG:256"
-        reward: "ACACIA_SAPLING:1"
-
-      spruce_to_bark:
-        gui-slot: 24
-        requirements:
-          - "SPRUCE_LOG:128"
-        reward: "STRIPPED_SPRUCE_LOG:4"
-
-      wood_to_bamboo:
-        gui-slot: 31
-        requirements:
-          - "OAK_LOG:64"
-        reward: "BAMBOO:4"
+  #  forest_keeper:
+  #    display-name: "§2§lTHỢ GỖ LÃO THÀNH"
+  #    profession: "LUMBERJACK"
+  #    level: 5
+  #
+  #    trades:
+  #      oak_to_jungle:
+  #        gui-slot: 20
+  #        requirements:
+  #          - "OAK_LOG:512"
+  #        reward: "JUNGLE_SAPLING:1"
+  #
+  #      birch_to_acacia:
+  #        gui-slot: 22
+  #        requirements:
+  #          - "BIRCH_LOG:256"
+  #        reward: "ACACIA_SAPLING:1"
+  #
+  #      spruce_to_bark:
+  #        gui-slot: 24
+  #        requirements:
+  #          - "SPRUCE_LOG:128"
+  #        reward: "STRIPPED_SPRUCE_LOG:4"
+  #
+  #      wood_to_bamboo:
+  #        gui-slot: 31
+  #        requirements:
+  #          - "OAK_LOG:64"
+  #        reward: "BAMBOO:4"
 
   wandering_merchant:
     display-name: "§e§lTHƯƠNG GIA LANG THANG"

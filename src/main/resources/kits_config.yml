@@ -1,0 +1,84 @@
+# Kits Configuration
+# Format:
+# kits:
+#   kit_id:
+#     display-name: "§a§lKit Name"
+#     description: "Kit description"
+#     usage-type: "ONCE" or "COOLDOWN"
+#     cooldown-hours: 24 (chỉ áp dụng khi usage-type: COOLDOWN)
+#     require-island: true/false
+#     items:
+#       - "MATERIAL:amount"
+#       - "MATERIAL:amount:display_name:lore"
+#       - "custom:item_id"
+
+kits:
+  khoidau:
+    display-name: "§a§lKit Khởi Đầu"
+    description: "Kit cơ bản để bắt đầu hành trình Skyblock"
+    usage-type: "ONCE"  # Chỉ dùng 1 lần
+    require-island: true
+    items:
+      - "ICE:2"
+      - "LAVA_BUCKET:1"
+      - "GOLDEN_HELMET:1"
+      - "GOLDEN_CHESTPLATE:1"
+      - "GOLDEN_LEGGINGS:1"
+      - "GOLDEN_BOOTS:1"
+      - "STONE_PICKAXE:1"
+      - "STONE_SWORD:1"
+      - "COOKED_PORKCHOP:16"
+
+  daily:
+    display-name: "§e§lKit Hàng Ngày"
+    description: "Nhận mỗi ngày để hỗ trợ phát triển đảo"
+    usage-type: "COOLDOWN"
+    cooldown-hours: 24  # 24 giờ
+    require-island: true
+    items:
+      - "BREAD:16"
+      - "COOKED_BEEF:8"
+
+#  vip:
+#    display-name: "§6§lKit VIP"
+#    description: "Kit đặc biệt cho VIP (mỗi 12 giờ)"
+#    usage-type: "COOLDOWN"
+#    cooldown-hours: 12
+#    require-island: false
+#    items:
+#      - "DIAMOND:4"
+#      - "GOLD_INGOT:8"
+#      - "IRON_INGOT:16"
+#      - "EMERALD:2"
+#      - "ENCHANTED_GOLDEN_APPLE:1"
+
+#  pvp:
+#    display-name: "§c§lKit PvP"
+#    description: "Trang bị chiến đấu (1 lần/tuần)"
+#    usage-type: "COOLDOWN"
+#    cooldown-hours: 168  # 7 ngày = 168 giờ
+#    require-island: false
+#    items:
+#      - "IRON_SWORD:1"
+#      - "IRON_HELMET:1"
+#      - "IRON_CHESTPLATE:1"
+#      - "IRON_LEGGINGS:1"
+#      - "IRON_BOOTS:1"
+#      - "SHIELD:1"
+#      - "ARROW:64"
+#      - "BOW:1"
+
+#  farming:
+#    display-name: "§2§lKit Nông Nghiệp"
+#    description: "Hỗ trợ canh tác (1 lần duy nhất)"
+#    usage-type: "ONCE"
+#    require-island: true
+#    items:
+#      - "WHEAT_SEEDS:32"
+#      - "CARROT:16"
+#      - "POTATO:16"
+#      - "MELON_SEEDS:8"
+#      - "PUMPKIN_SEEDS:8"
+#      - "BONE_MEAL:32"
+#      - "WATER_BUCKET:1"
+#      - "IRON_HOE:1"

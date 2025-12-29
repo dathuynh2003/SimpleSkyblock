@@ -23,3 +23,7 @@ commands:
   tp:
     description: Teleport request commands
     usage: /<command> <player> hoặc /<command> accept <player>
+  kit:
+    description: Claim starter kits
+    usage: /<command> [kit_name]
+    aliases: [ kits ]
