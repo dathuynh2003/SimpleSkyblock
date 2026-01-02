@@ -2,6 +2,7 @@ package com.dathuynh.simpleskyblock.commands;
 
 import com.dathuynh.simpleskyblock.managers.ArenaManager;
 import com.dathuynh.simpleskyblock.managers.MiningZoneManager;
+import com.dathuynh.simpleskyblock.managers.NetherZoneManager;
 import com.dathuynh.simpleskyblock.managers.SpawnManager;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -14,11 +15,13 @@ public class WarpCommand implements CommandExecutor {
     private MiningZoneManager miningZoneManager;
     private SpawnManager spawnManager;
     private ArenaManager arenaManager;
+    private NetherZoneManager netherZoneManager;
 
-    public WarpCommand(MiningZoneManager miningZoneManager, SpawnManager spawnManager, ArenaManager arenaManager) {
+    public WarpCommand(MiningZoneManager miningZoneManager, SpawnManager spawnManager, ArenaManager arenaManager, NetherZoneManager netherZoneManager) {
         this.miningZoneManager = miningZoneManager;
         this.spawnManager = spawnManager;
         this.arenaManager = arenaManager;
+        this.netherZoneManager = netherZoneManager;
     }
 
     @Override
@@ -36,6 +39,7 @@ public class WarpCommand implements CommandExecutor {
             player.sendMessage("§7  /warp lobby §f- Lobby spawn");
             player.sendMessage("§7  /warp khumine §f- Khu mine PvP");
             player.sendMessage("§7  /warp arena1 §f- Boss arena");
+            player.sendMessage("§7  /warp nether §f- Teleport to Nether");
             player.sendMessage("§e═══════════════════════════════");
             return true;
         }
@@ -76,6 +80,17 @@ public class WarpCommand implements CommandExecutor {
                 } else {
                     player.sendMessage("§c✗ Arena1 không khả dụng!");
                 }
+                break;
+            case "nether":
+                if (!netherZoneManager.isNetherZoneCreated()) {
+                    player.sendMessage("§c⚠ Khu vực Nether chưa được tạo!");
+                    player.sendMessage("§7Admin sử dụng: §e/init nether");
+                    return true;
+                }
+                Location netherLoc = netherZoneManager.getNetherWarpLocation();
+                player.teleport(netherLoc);
+                player.sendMessage("§a✓ Đã teleport đến Nether Zone!");
+                player.sendMessage("§7⚠ Khu vực PvP tắt, chết không rơi đồ!");
                 break;
 
             default:

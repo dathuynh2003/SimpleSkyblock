@@ -1,0 +1,20 @@
+nether_zone:
+  wither_skeleton_drops:
+    # Chance to KEEP item after it drops (0.0 - 1.0)
+    # Example: bone_rate = 0.3 means 30% of dropped bones are kept, 70% removed
+    # Formula: Final Drop Rate = Default Drop Rate × Chance to Keep
+
+    bone_rate: 0.3           # Keep 30% of bones (Giảm 70%)
+    coal_rate: 0.5           # Keep 50% of coal (Giảm 50%)
+    skull_rate: 0.1          # Keep 100% of skulls (Không giảm - rare rồi)
+    stone_sword_rate: 1.0    # Keep 10% of stone swords (Giảm 90%)
+
+    # XP settings
+    reduce_xp: true          # Giảm XP drop?
+    xp_multiplier: 0.5       # XP multiplier (0.5 = 50% XP)
+
+    # Only reduce drops when killed by player?
+    player_kill_only: true   # false = giảm cả khi mob tự chết
+
+    # Show detailed logs in console? (For debugging)
+    detailed_logging: true  # false = tắt log chi tiế

@@ -17,7 +17,7 @@ commands:
     usage: /<command> spawn
   init:
     description: Initialize server components
-    usage: /<command> spawnlobby
+    usage: /<command> [khumine|lobby|arena1|nether]
     permission: simpleskyblock.admin
     permission-message: "§cChỉ admin mới có thể sử dụng lệnh này!"
   restart:
@@ -34,7 +34,7 @@ commands:
     aliases: [ kits ]
   warp:
     description: Teleport to warps
-    usage: /<command> [khumine|lobby]
+    usage: /<command> [khumine|lobby|arena1|nether]
   register:
     description: Register a new account
     usage: /<command> <password> <password>

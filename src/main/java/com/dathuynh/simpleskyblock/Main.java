@@ -22,6 +22,7 @@ public class Main extends JavaPlugin {
     private AuthManager authManager;
     private ArenaManager arenaManager;
     private BossManager bossManager;
+    private NetherZoneManager netherZoneManager;
 
     private KitCommand kitCommand;
     private int autoSaveTaskId;
@@ -43,6 +44,7 @@ public class Main extends JavaPlugin {
         miningZoneManager = new MiningZoneManager(this);
         arenaManager = new ArenaManager(this);
         bossManager = new BossManager(this, arenaManager, itemManager);
+        netherZoneManager = new NetherZoneManager(this);
 
         // Commands
         IslandCommand islandCommand = new IslandCommand(this, islandManager);
@@ -51,8 +53,8 @@ public class Main extends JavaPlugin {
         getCommand("is").setExecutor(islandCommand);
         getCommand("spawn").setExecutor(new SpawnCommand(spawnManager));
         getCommand("npc").setExecutor(new NPCCommand(npcManager));
-        getCommand("warp").setExecutor(new WarpCommand(miningZoneManager, spawnManager, arenaManager));
-        getCommand("init").setExecutor(new InitCommand(spawnManager, miningZoneManager, arenaManager));
+        getCommand("warp").setExecutor(new WarpCommand(miningZoneManager, spawnManager, arenaManager, netherZoneManager));
+        getCommand("init").setExecutor(new InitCommand(spawnManager, miningZoneManager, arenaManager, netherZoneManager));
         getCommand("restart").setExecutor(new RestartCommand(this));
         getCommand("tp").setExecutor(new TeleportCommand());
         getCommand("kit").setExecutor(kitCommand);
@@ -75,6 +77,9 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MiningZoneProtection(miningZoneManager), this);
         getServer().getPluginManager().registerEvents(new ArenaProtection(arenaManager), this);
         getServer().getPluginManager().registerEvents(new BossListener(bossManager, arenaManager), this);
+        getServer().getPluginManager().registerEvents(new NetherProtection(netherZoneManager), this);
+        getServer().getPluginManager().registerEvents(new NetherZoneListener(this, netherZoneManager), this);
+
         // Load kit data
         loadKitData();
 
