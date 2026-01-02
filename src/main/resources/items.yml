@@ -56,6 +56,7 @@ items:
   god_sword:
     material: DIAMOND_SWORD
     display-name: "§c§lKiếm Bá Chủ"
+    custom-model-data: 100
     lore:
       - "§7Sát thương: §c+100"
       - "§7Tốc độ: §e+50%"

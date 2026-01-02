@@ -1,8 +1,9 @@
 package com.dathuynh.simpleskyblock.listeners;
 
 import com.dathuynh.simpleskyblock.managers.IslandManager;
+import com.dathuynh.simpleskyblock.managers.SpawnManager;
 import com.dathuynh.simpleskyblock.models.Island;
-import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -10,25 +11,29 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 public class RespawnListener implements Listener {
 
     private IslandManager islandManager;
+    private SpawnManager spawnManager;
 
-    public RespawnListener(IslandManager islandManager) {
+    // ✅ THÊM SpawnManager vào constructor
+    public RespawnListener(IslandManager islandManager, SpawnManager spawnManager) {
         this.islandManager = islandManager;
+        this.spawnManager = spawnManager;
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        // Lấy đảo của player
-        Island island = islandManager.getIsland(event.getPlayer().getUniqueId());
+        Player player = event.getPlayer();
+        Island island = islandManager.getIsland(player.getUniqueId());
 
-        if (island != null) {
-            // Lấy death location
-            Location deathLoc = event.getPlayer().getLastDeathLocation();
-
-            // Nếu chết trong khu vực đảo của mình -> respawn tại đảo
-            if (deathLoc != null && islandManager.isLocationInIsland(deathLoc, island.getLocation())) {
-                event.setRespawnLocation(island.getLocation());
-            }
-            // Nếu chết ngoài đảo -> respawn mặc định (spawn lobby)
+        //Nếu có island → luôn respawn tại island (bất kể chết ở đâu)
+        if (island != null && island.getLocation() != null) {
+            event.setRespawnLocation(island.getLocation());
+            player.sendMessage("§aĐã hồi sinh tại đảo của bạn!");
+        }
+        //Nếu không có island → respawn tại lobby
+        else {
+            event.setRespawnLocation(spawnManager.getSpawnLocation());
+            player.sendMessage("§eĐã hồi sinh tại Lobby!");
+            player.sendMessage("§7Sử dụng §e/is create §7để tạo đảo riêng!");
         }
     }
 }

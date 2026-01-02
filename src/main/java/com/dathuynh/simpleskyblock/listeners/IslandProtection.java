@@ -26,6 +26,10 @@ public class IslandProtection implements Listener {
         Player player = event.getPlayer();
         Location blockLoc = event.getBlock().getLocation();
 
+        if (blockLoc.getWorld() != null && blockLoc.getWorld().getName().equals("world_lobby")) {
+            return;
+        }
+
         if (event.getBlock().getType() == Material.BARRIER) {
             if (!player.isOp()) { // ✅ Chỉ chặn non-OP
                 event.setCancelled(true);
@@ -59,6 +63,11 @@ public class IslandProtection implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         Location blockLoc = event.getBlock().getLocation();
+
+        // Bypass nếu ở world_lobby
+        if (blockLoc.getWorld() != null && blockLoc.getWorld().getName().equals("world_lobby")) {
+            return;
+        }
 
         // Admin bypass
         if (player.isOp()) {
@@ -102,6 +111,11 @@ public class IslandProtection implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         Location to = event.getTo();
+
+        // Bypass nếu ở world_lobby
+        if (to.getWorld().getName().equals("world_lobby")) {
+            return;
+        }
 
         // Admin bypass
         if (player.isOp()) {

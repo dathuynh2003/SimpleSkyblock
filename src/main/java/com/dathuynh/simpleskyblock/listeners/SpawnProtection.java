@@ -61,11 +61,20 @@ public class SpawnProtection implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        // Buff speed khi ở spawn
+        //Chỉ check khi player thực sự di chuyển
+        if (event.getFrom().getBlockX() == event.getTo().getBlockX() &&
+                event.getFrom().getBlockY() == event.getTo().getBlockY() &&
+                event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
+            return;
+        }
+
         if (SpawnManager.isInSpawnArea(player.getLocation())) {
             if (!player.hasPotionEffect(PotionEffectType.SPEED)) {
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 1, false, false));
+                player.addPotionEffect(new PotionEffect(
+                        PotionEffectType.SPEED, 200, 1, false, false
+                )); // Tăng duration lên 200 ticks (10s)
             }
         }
     }
+
 }

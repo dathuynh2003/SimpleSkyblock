@@ -188,8 +188,17 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder setCustomModelData(int data) {
+        if (data > 0) {
+            meta.setCustomModelData(data);
+        }
+        return this;
+    }
+
     public ItemStack build() {
         item.setItemMeta(meta);
         return item;
     }
+
+
 }

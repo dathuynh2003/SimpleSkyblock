@@ -15,6 +15,7 @@ public class CustomItem {
     private List<String> lore;
     private Map<Enchantment, Integer> enchantments;
     private boolean unbreakable;
+    private int customModelData = 0;
 
     // Custom attributes
     private Double damage;
@@ -132,5 +133,13 @@ public class CustomItem {
 
     public Double getMovementSpeed() {
         return movementSpeed;
+    }
+
+    public int getCustomModelData() {
+        return customModelData;
+    }
+
+    public void setCustomModelData(int customModelData) {
+        this.customModelData = customModelData;
     }
 }

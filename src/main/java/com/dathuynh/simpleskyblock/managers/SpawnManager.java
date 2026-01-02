@@ -1,15 +1,34 @@
 package com.dathuynh.simpleskyblock.managers;
 
 import com.dathuynh.simpleskyblock.Main;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.SideEffectSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class SpawnManager {
+    private static final int CENTER_LOBBY_X = 69;
+    private static final int CENTER_LOBBY_Z = 143;
+    private static final int CENTER_LOBBY_Y = -51;
 
     private static Location spawnLobby;
-    private static boolean isCreated = false;
+    private static World lobbyWorld;
     private Main plugin;
 
     public SpawnManager(Main plugin) {
@@ -18,56 +37,140 @@ public class SpawnManager {
     }
 
     private void setupSpawnLobby() {
-        World world = Bukkit.getWorld("world");
-        spawnLobby = new Location(world, 0.5, 100, 0.5);
+        // 1. Kiểm tra world_lobby đã tồn tại chưa
+        File worldFolder = new File(Bukkit.getWorldContainer(), "world_lobby");
+        boolean worldExists = worldFolder.exists() && new File(worldFolder, "level.dat").exists();
 
-        // Kiểm tra xem đã tạo chưa
-        if (!isCreated && world.getBlockAt(0, 99, 0).getType() != Material.STONE) {
-            createSpawnPlatform(world);
-            plugin.getLogger().info("Spawn lobby đã được tạo tại (0, 100, 0)!");
+        // 2. Load/Create world_lobby
+        lobbyWorld = Bukkit.getWorld("world_lobby");
+
+        if (lobbyWorld == null) {
+            if (!worldExists) {
+                plugin.getLogger().info("World lobby chưa tồn tại, đang tạo void world...");
+            } else {
+                plugin.getLogger().info("World lobby đã tồn tại, đang load...");
+            }
+
+            WorldCreator creator = new WorldCreator("world_lobby");
+            creator.generator("VoidWorldGenerator");
+            lobbyWorld = creator.createWorld();
+            plugin.getLogger().info("Đã load world_lobby!");
         }
 
-        // Set world spawn location
-        world.setSpawnLocation(spawnLobby);
-        isCreated = true;
+        // 3. Set spawn location
+        spawnLobby = new Location(lobbyWorld, CENTER_LOBBY_X + 0.5, 100 + CENTER_LOBBY_Y, CENTER_LOBBY_Z + 0.5);
+        lobbyWorld.setSpawnLocation(spawnLobby);
+
+        // 4. Check lobby đã paste chưa
+        if (lobbyWorld.getBlockAt(CENTER_LOBBY_X, 100 + CENTER_LOBBY_Y - 1, CENTER_LOBBY_Z).getType().isAir()) {
+            plugin.getLogger().warning("═══════════════════════════════════════════");
+            plugin.getLogger().warning(" LOBBY CHƯA ĐƯỢC PASTE!");
+            plugin.getLogger().warning(" Sử dụng lệnh: /init spawnlobby");
+            plugin.getLogger().warning(" (Chỉ cần chạy 1 lần duy nhất)");
+            plugin.getLogger().warning("═══════════════════════════════════════════");
+        } else {
+            plugin.getLogger().info("Lobby schematic đã sẵn sàng!");
+        }
     }
 
-    private void createSpawnPlatform(World world) {
-        // Tạo platform spawn 7x7
-        for (int x = -3; x <= 3; x++) {
-            for (int z = -3; z <= 3; z++) {
-                world.getBlockAt(x, 99, z).setType(Material.STONE);
-            }
+    public void pasteSchematicManually() {
+        File schematicFile = new File(plugin.getDataFolder(), "world_lobby.schem");
+
+        if (!schematicFile.exists()) {
+            plugin.getLogger().warning("Không tìm thấy file: world_lobby.schem");
+            plugin.getLogger().warning("  Đặt file vào: " + schematicFile.getAbsolutePath());
+            return;
         }
 
-        // Viền platform bằng stone bricks
-        for (int x = -3; x <= 3; x++) {
-            world.getBlockAt(x, 99, -3).setType(Material.STONE_BRICKS);
-            world.getBlockAt(x, 99, 3).setType(Material.STONE_BRICKS);
-        }
-        for (int z = -3; z <= 3; z++) {
-            world.getBlockAt(-3, 99, z).setType(Material.STONE_BRICKS);
-            world.getBlockAt(3, 99, z).setType(Material.STONE_BRICKS);
-        }
+        plugin.getLogger().info("Bắt đầu paste lobby schematic...");
+        plugin.getLogger().info("Server sẽ lag trong 10-15 giây, vui lòng đợi...");
 
-        // Tạo beacon base (iron blocks 3x3)
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                world.getBlockAt(x, 98, z).setType(Material.IRON_BLOCK);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
+                if (format == null) {
+                    plugin.getLogger().severe("Không nhận diện được format schematic!");
+                    return;
+                }
+
+                Clipboard clipboard;
+                try (ClipboardReader reader = format.getReader(new FileInputStream(schematicFile))) {
+                    clipboard = reader.read();
+                }
+
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    try (EditSession editSession = WorldEdit.getInstance()
+                            .newEditSession(BukkitAdapter.adapt(lobbyWorld))) {
+
+                        editSession.setFastMode(true);
+                        editSession.setSideEffectApplier(SideEffectSet.none());
+
+                        Operation operation = new ClipboardHolder(clipboard)
+                                .createPaste(editSession)
+                                .to(BlockVector3.at(0, 100, 0))
+                                .ignoreAirBlocks(false)
+                                .copyBiomes(false)
+                                .copyEntities(false)
+                                .build();
+
+                        Operations.complete(operation);
+
+                        plugin.getLogger().info("═══════════════════════════════════════════");
+                        plugin.getLogger().info("Đã paste lobby schematic thành công!");
+                        plugin.getLogger().info("Vị trí: (0, 100, 0) trong world_lobby");
+                        plugin.getLogger().info("═══════════════════════════════════════════");
+
+                    } catch (Exception e) {
+                        plugin.getLogger().severe("Lỗi paste: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                });
+
+            } catch (IOException e) {
+                plugin.getLogger().severe("Lỗi load schematic: " + e.getMessage());
+                e.printStackTrace();
             }
-        }
+        });
     }
 
     public Location getSpawnLocation() {
         return spawnLobby;
     }
 
-    public static boolean isInSpawnArea(Location loc) {
-        if (spawnLobby == null) return false;
+    public World getLobbyWorld() {
+        return lobbyWorld;
+    }
 
-        return loc.getWorld().equals(spawnLobby.getWorld()) &&
-                Math.abs(loc.getX() - spawnLobby.getX()) <= 5 &&
-                Math.abs(loc.getZ() - spawnLobby.getZ()) <= 5 &&
-                Math.abs(loc.getY() - spawnLobby.getY()) <= 5;
+    /**
+     * Kiểm tra location có trong spawn area không
+     * Spawn area = Toàn bộ world_lobby NGOẠI TRỪ khu mine
+     */
+    public static boolean isInSpawnArea(Location loc) {
+        if (spawnLobby == null || lobbyWorld == null) return false;
+        if (loc.getWorld() == null || !loc.getWorld().equals(lobbyWorld)) return false;
+
+        int x = loc.getBlockX();
+        int y = loc.getBlockY();
+        int z = loc.getBlockZ();
+
+        // Check nếu ở trong khu mine → KHÔNG phải spawn area
+        // Khu mine: (5000, 100, 5000) với size 51x60x51
+        int mineMinX = 5000;
+        int mineMaxX = mineMinX + 51 + 1;
+        int mineMinY = 100 - 1;   // MINE_Y - 1 (đáy bedrock)
+        int mineMaxY = 100 + 60;  // MINE_Y + WALL_HEIGHT
+        int mineMinZ = 5000;
+        int mineMaxZ = mineMinZ + 51 + 1;
+
+        boolean isInMine = x >= mineMinX && x <= mineMaxX &&
+                y >= mineMinY && y <= mineMaxY &&
+                z >= mineMinZ && z <= mineMaxZ;
+
+        // Spawn area = world_lobby NHƯNG không phải khu mine
+        return !isInMine;
+    }
+
+    public static boolean isLobbyWorld(World world) {
+        return lobbyWorld != null && world != null && world.equals(lobbyWorld);
     }
 }

@@ -1,6 +1,7 @@
 package com.dathuynh.simpleskyblock;
 
 import com.dathuynh.simpleskyblock.commands.*;
+import com.dathuynh.simpleskyblock.commands.WarpCommand;
 import com.dathuynh.simpleskyblock.listeners.*;
 import com.dathuynh.simpleskyblock.managers.*;
 import com.dathuynh.simpleskyblock.utils.ConfigLoader;
@@ -16,6 +17,9 @@ public class Main extends JavaPlugin {
     private NPCManager npcManager;
     private ConfigLoader configLoader;
     private IslandManager islandManager;
+    private MiningZoneManager miningZoneManager;
+    private AuthManager authManager;
+
     private KitCommand kitCommand;
     private int autoSaveTaskId;
 
@@ -30,7 +34,9 @@ public class Main extends JavaPlugin {
         // Managers
         spawnManager = new SpawnManager(this);
         npcManager = new NPCManager(this, configLoader);
+        authManager = new AuthManager(this);
         islandManager = new IslandManager(this);
+        miningZoneManager = new MiningZoneManager(this);
 
         // Commands
         IslandCommand islandCommand = new IslandCommand(this, islandManager);
@@ -39,18 +45,27 @@ public class Main extends JavaPlugin {
         getCommand("is").setExecutor(islandCommand);
         getCommand("spawn").setExecutor(new SpawnCommand(spawnManager));
         getCommand("npc").setExecutor(new NPCCommand(npcManager));
+        getCommand("warp").setExecutor(new WarpCommand(miningZoneManager, spawnManager));
+        getCommand("init").setExecutor(new InitCommand(spawnManager, miningZoneManager));
         getCommand("restart").setExecutor(new RestartCommand(this));
         getCommand("tp").setExecutor(new TeleportCommand());
         getCommand("kit").setExecutor(kitCommand);
 
+        // Auth commands
+        getCommand("register").setExecutor(new AuthCommand(authManager, "register"));
+        getCommand("login").setExecutor(new AuthCommand(authManager, "login"));
+        getCommand("changepassword").setExecutor(new AuthCommand(authManager, "changepassword"));
+
         // Event Listeners
+        getServer().getPluginManager().registerEvents(new AuthListener(authManager, this), this);
         getServer().getPluginManager().registerEvents(new SpawnProtection(), this);
+        getServer().getPluginManager().registerEvents(new JoinListener(spawnManager, this), this);
         getServer().getPluginManager().registerEvents(new IslandProtection(islandManager), this);
         getServer().getPluginManager().registerEvents(npcManager, this);
         getServer().getPluginManager().registerEvents(new TradeMenuListener(configLoader), this);
-        getServer().getPluginManager().registerEvents(new RespawnListener(islandManager), this);
+        getServer().getPluginManager().registerEvents(new RespawnListener(islandManager, spawnManager), this);
         getServer().getPluginManager().registerEvents(new IslandPvPProtection(islandManager), this);
-
+        getServer().getPluginManager().registerEvents(new MiningZoneProtection(miningZoneManager), this);
         // Load kit data
         loadKitData();
 
@@ -64,6 +79,12 @@ public class Main extends JavaPlugin {
         if (autoSaveTaskId != -1) {
             getServer().getScheduler().cancelTask(autoSaveTaskId);
         }
+
+        if (authManager != null) {
+            authManager.saveAuthData();
+            getLogger().info("Đã lưu auth data!");
+        }
+
         // Save data cuối cùng trước khi tắt
         if (islandManager != null) {
             islandManager.saveData();
@@ -73,6 +94,10 @@ public class Main extends JavaPlugin {
         if (kitCommand != null) {
             saveKitData();
             getLogger().info("Đã lưu kit data!");
+        }
+
+        if (miningZoneManager != null) {
+            miningZoneManager.stopAutoReset();
         }
 
         getLogger().info("SimpleSkyblock plugin đã tắt!");
@@ -98,6 +123,10 @@ public class Main extends JavaPlugin {
 
     public IslandManager getIslandManager() {
         return islandManager;
+    }
+
+    public SpawnManager getSpawnManager() {
+        return spawnManager;
     }
 
     private void loadKitData() {

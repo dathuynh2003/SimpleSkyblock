@@ -74,6 +74,9 @@ public class ConfigLoader {
         item.setLore(section.getStringList("lore"));
         item.setUnbreakable(section.getBoolean("unbreakable", false));
 
+        // ← THÊM CUSTOM MODEL DATA NGAY ĐÂY
+        item.setCustomModelData(section.getInt("custom-model-data", 0));
+
         // Enchantments
         ConfigurationSection enchants = section.getConfigurationSection("enchantments");
         if (enchants != null) {
@@ -133,9 +136,7 @@ public class ConfigLoader {
 
     private NPCData parseNPC(String id, ConfigurationSection section) {
         String displayName = section.getString("display-name", "§eNPC");
-        Villager.Profession profession = Villager.Profession.valueOf(
-                section.getString("profession", "TOOLSMITH")
-        );
+        Villager.Profession profession = Villager.Profession.valueOf(section.getString("profession", "TOOLSMITH"));
         int level = section.getInt("level", 5);
 
         // Parse trades
@@ -196,9 +197,7 @@ public class ConfigLoader {
     }
 
     private ItemStack buildItemFromCustom(CustomItem customItem) {
-        ItemBuilder builder = new ItemBuilder(customItem.getMaterial())
-                .setName(customItem.getDisplayName())
-                .setUnbreakable(customItem.isUnbreakable());
+        ItemBuilder builder = new ItemBuilder(customItem.getMaterial()).setName(customItem.getDisplayName()).setUnbreakable(customItem.isUnbreakable());
 
         if (customItem.getLore() != null) {
             builder.setLore(customItem.getLore());
@@ -229,9 +228,25 @@ public class ConfigLoader {
             builder.setMovementSpeed(customItem.getMovementSpeed());
         }
 
+        if (customItem.getCustomModelData() > 0) {
+            plugin.getLogger().info("✅ ĐANG SET CustomModelData=" + customItem.getCustomModelData() + " cho " + customItem.getId());
+            builder.setCustomModelData(customItem.getCustomModelData());
+        } else {
+            plugin.getLogger().warning("❌ CustomModelData = 0 cho " + customItem.getId());
+        }
+
         builder.hideAllFlags();
 
-        return builder.build();
+        ItemStack result = builder.build();
+
+        // KIỂM TRA SAU KHI BUILD
+        if (result.hasItemMeta() && result.getItemMeta().hasCustomModelData()) {
+            plugin.getLogger().info("✅✅ Item " + customItem.getId() + " ĐÃ CÓ CustomModelData=" + result.getItemMeta().getCustomModelData());
+        } else {
+            plugin.getLogger().warning("❌❌ Item " + customItem.getId() + " KHÔNG CÓ CustomModelData sau khi build!");
+        }
+
+        return result;
     }
 
     // Getters

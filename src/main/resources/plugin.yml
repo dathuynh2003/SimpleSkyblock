@@ -3,7 +3,7 @@ version: 1.0
 main: com.dathuynh.simpleskyblock.Main
 api-version: 1.20
 author: DatHuynh
-depend: [WorldEdit]
+depend: [ WorldEdit ]
 commands:
   is:
     description: Island management commands
@@ -15,6 +15,11 @@ commands:
   npc:
     description: NPC management
     usage: /<command> spawn
+  init:
+    description: Initialize server components
+    usage: /<command> spawnlobby
+    permission: simpleskyblock.admin
+    permission-message: "§cChỉ admin mới có thể sử dụng lệnh này!"
   restart:
     description: Restart server
     usage: /<command>
@@ -27,3 +32,18 @@ commands:
     description: Claim starter kits
     usage: /<command> [kit_name]
     aliases: [ kits ]
+  warp:
+    description: Teleport to warps
+    usage: /<command> [khumine|lobby]
+  register:
+    description: Register a new account
+    usage: /<command> <password> <password>
+    aliases: [ reg ]
+  login:
+    description: Login to your account
+    usage: /<command> <password>
+    aliases: [ l ]
+  changepassword:
+    description: Change your password
+    usage: /<command> <oldPassword> <newPassword>
+    aliases: [ changepw, chpw ]

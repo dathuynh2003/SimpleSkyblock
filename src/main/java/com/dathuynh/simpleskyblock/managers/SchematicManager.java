@@ -37,22 +37,22 @@ public class SchematicManager {
         }
 
         if (!schematicFile.exists()) {
-            plugin.getLogger().warning("⚠ Không tìm thấy island_starter.schem!");
-            plugin.getLogger().warning("→ Đặt file vào: plugins/WorldEdit/schematics/ hoặc " + plugin.getDataFolder().getPath());
+            plugin.getLogger().warning("Không tìm thấy island_starter.schem!");
+            plugin.getLogger().warning("Đặt file vào: plugins/WorldEdit/schematics/ hoặc " + plugin.getDataFolder().getPath());
             return;
         }
 
         ClipboardFormat format = ClipboardFormats.findByFile(schematicFile);
         if (format == null) {
-            plugin.getLogger().severe("❌ File schematic không hợp lệ!");
+            plugin.getLogger().severe("File schematic không hợp lệ!");
             return;
         }
 
         try (ClipboardReader reader = format.getReader(new FileInputStream(schematicFile))) {
             islandTemplate = reader.read();
-            plugin.getLogger().info("✔ Đã load island template thành công!");
+            plugin.getLogger().info("Đã load island template thành công!");
         } catch (Exception e) {
-            plugin.getLogger().severe("❌ Lỗi khi load schematic: " + e.getMessage());
+            plugin.getLogger().severe("Lỗi khi load schematic: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -76,7 +76,7 @@ public class SchematicManager {
                 return true;
             }
         } catch (Exception e) {
-            plugin.getLogger().severe("❌ Lỗi khi paste island: " + e.getMessage());
+            plugin.getLogger().severe("Lỗi khi paste island: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
