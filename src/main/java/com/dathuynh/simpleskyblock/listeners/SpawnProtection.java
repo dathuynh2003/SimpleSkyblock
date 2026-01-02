@@ -3,10 +3,13 @@ package com.dathuynh.simpleskyblock.listeners;
 import com.dathuynh.simpleskyblock.managers.SpawnManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -54,6 +57,55 @@ public class SpawnProtection implements Listener {
                 event.setCancelled(true);
                 attacker.sendMessage("§cKhông thể PvP ở spawn lobby!");
             }
+        }
+    }
+
+    /**
+     * Chặn FALL DAMAGE trong spawn
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onFallDamage(EntityDamageEvent event) {
+        // Chỉ check nếu là player
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        // Chỉ check fall damage
+        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) {
+            return;
+        }
+
+        Player player = (Player) event.getEntity();
+
+        // Nếu player ở trong spawn → cancel fall damage
+        if (SpawnManager.isInSpawnArea(player.getLocation())) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Giữ items và XP khi chết trong spawn lobby
+     */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+
+        // Check nếu player chết trong spawn area
+        if (SpawnManager.isInSpawnArea(player.getLocation())) {
+            // Giữ inventory (items + armor)
+            event.setKeepInventory(true);
+
+            // Giữ XP level
+            event.setKeepLevel(true);
+
+            // Clear tất cả drops (để không duplicate items)
+            event.getDrops().clear();
+
+            // Set dropped XP = 0 (để không rơi XP orbs)
+            event.setDroppedExp(0);
+
+            // Optional: Message cho player
+            // player.sendMessage("§a✓ Bạn đã giữ items vì chết trong Spawn Lobby!");
         }
     }
 

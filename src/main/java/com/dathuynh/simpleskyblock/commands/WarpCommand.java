@@ -1,5 +1,6 @@
 package com.dathuynh.simpleskyblock.commands;
 
+import com.dathuynh.simpleskyblock.managers.ArenaManager;
 import com.dathuynh.simpleskyblock.managers.MiningZoneManager;
 import com.dathuynh.simpleskyblock.managers.SpawnManager;
 import org.bukkit.Location;
@@ -12,10 +13,12 @@ public class WarpCommand implements CommandExecutor {
 
     private MiningZoneManager miningZoneManager;
     private SpawnManager spawnManager;
+    private ArenaManager arenaManager;
 
-    public WarpCommand(MiningZoneManager miningZoneManager, SpawnManager spawnManager) {
+    public WarpCommand(MiningZoneManager miningZoneManager, SpawnManager spawnManager, ArenaManager arenaManager) {
         this.miningZoneManager = miningZoneManager;
         this.spawnManager = spawnManager;
+        this.arenaManager = arenaManager;
     }
 
     @Override
@@ -30,8 +33,9 @@ public class WarpCommand implements CommandExecutor {
         if (args.length == 0) {
             player.sendMessage("§e═══════════════════════════════");
             player.sendMessage("§6⚡ Danh sách warp:");
-            player.sendMessage("§7  /warp khumine §f- Khu mine PvP");
             player.sendMessage("§7  /warp lobby §f- Lobby spawn");
+            player.sendMessage("§7  /warp khumine §f- Khu mine PvP");
+            player.sendMessage("§7  /warp arena1 §f- Boss arena");
             player.sendMessage("§e═══════════════════════════════");
             return true;
         }
@@ -39,6 +43,12 @@ public class WarpCommand implements CommandExecutor {
         String warpName = args[0].toLowerCase();
 
         switch (warpName) {
+            case "lobby":
+            case "spawn":
+                player.teleport(spawnManager.getSpawnLocation());
+                player.sendMessage("§a✓ Đã teleport về Lobby!");
+                break;
+
             case "khumine":
             case "mine":
                 Location mineLoc = miningZoneManager.getMiningWarpLocation();
@@ -51,10 +61,21 @@ public class WarpCommand implements CommandExecutor {
                 player.sendMessage("§c⚠ Cảnh báo: PvP được bật, hãy cẩn thận!");
                 break;
 
-            case "lobby":
-            case "spawn":
-                player.teleport(spawnManager.getSpawnLocation());
-                player.sendMessage("§a✓ Đã teleport về Lobby!");
+            case "arena1":
+                if (!arenaManager.isArena1Created()) {
+                    player.sendMessage("§c✗ Arena1 chưa được tạo!");
+                    player.sendMessage("§7Admin dùng: §e/init arena1");
+                    return true;
+                }
+
+                Location arenaLoc = arenaManager.getArena1Center();
+                if (arenaLoc != null) {
+                    player.teleport(arenaLoc);
+                    player.sendMessage("§a✓ Đã teleport tới §cArena1§a!");
+                    player.sendMessage("§7⚠ Không có PvP và không rơi items khi chết!");
+                } else {
+                    player.sendMessage("§c✗ Arena1 không khả dụng!");
+                }
                 break;
 
             default:

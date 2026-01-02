@@ -19,6 +19,7 @@ public class Main extends JavaPlugin {
     private IslandManager islandManager;
     private MiningZoneManager miningZoneManager;
     private AuthManager authManager;
+    private ArenaManager arenaManager;
 
     private KitCommand kitCommand;
     private int autoSaveTaskId;
@@ -37,6 +38,7 @@ public class Main extends JavaPlugin {
         authManager = new AuthManager(this);
         islandManager = new IslandManager(this);
         miningZoneManager = new MiningZoneManager(this);
+        arenaManager = new ArenaManager(this);
 
         // Commands
         IslandCommand islandCommand = new IslandCommand(this, islandManager);
@@ -45,8 +47,8 @@ public class Main extends JavaPlugin {
         getCommand("is").setExecutor(islandCommand);
         getCommand("spawn").setExecutor(new SpawnCommand(spawnManager));
         getCommand("npc").setExecutor(new NPCCommand(npcManager));
-        getCommand("warp").setExecutor(new WarpCommand(miningZoneManager, spawnManager));
-        getCommand("init").setExecutor(new InitCommand(spawnManager, miningZoneManager));
+        getCommand("warp").setExecutor(new WarpCommand(miningZoneManager, spawnManager, arenaManager));
+        getCommand("init").setExecutor(new InitCommand(spawnManager, miningZoneManager, arenaManager));
         getCommand("restart").setExecutor(new RestartCommand(this));
         getCommand("tp").setExecutor(new TeleportCommand());
         getCommand("kit").setExecutor(kitCommand);
@@ -66,6 +68,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new RespawnListener(islandManager, spawnManager), this);
         getServer().getPluginManager().registerEvents(new IslandPvPProtection(islandManager), this);
         getServer().getPluginManager().registerEvents(new MiningZoneProtection(miningZoneManager), this);
+        getServer().getPluginManager().registerEvents(new ArenaProtection(arenaManager), this);
         // Load kit data
         loadKitData();
 

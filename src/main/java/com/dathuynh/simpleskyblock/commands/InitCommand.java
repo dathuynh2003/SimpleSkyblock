@@ -1,5 +1,6 @@
 package com.dathuynh.simpleskyblock.commands;
 
+import com.dathuynh.simpleskyblock.managers.ArenaManager;
 import com.dathuynh.simpleskyblock.managers.MiningZoneManager;
 import com.dathuynh.simpleskyblock.managers.SpawnManager;
 import org.bukkit.command.Command;
@@ -11,10 +12,12 @@ public class InitCommand implements CommandExecutor {
 
     private SpawnManager spawnManager;
     private MiningZoneManager miningZoneManager;
+    private ArenaManager arenaManager;
 
-    public InitCommand(SpawnManager spawnManager, MiningZoneManager miningZoneManager) {
+    public InitCommand(SpawnManager spawnManager, MiningZoneManager miningZoneManager, ArenaManager arenaManager) {
         this.spawnManager = spawnManager;
         this.miningZoneManager = miningZoneManager;
+        this.arenaManager = arenaManager;
     }
 
     @Override
@@ -23,7 +26,7 @@ public class InitCommand implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (!player.isOp()) {
-                player.sendMessage("§c❌ Chỉ admin mới có thể sử dụng lệnh này!");
+                player.sendMessage("§cChỉ admin mới có thể sử dụng lệnh này!");
                 return true;
             }
         }
@@ -34,6 +37,7 @@ public class InitCommand implements CommandExecutor {
             sender.sendMessage("§6⚙ §eLệnh khởi tạo server:");
             sender.sendMessage("§7  /init spawnlobby §f- Paste lobby schematic");
             sender.sendMessage("§7  /init khumine §f- Reset khu mine");
+            sender.sendMessage("§7  /init arena1 §f- Create boss arena");
             sender.sendMessage("§e═══════════════════════════════════════════");
             return true;
         }
@@ -55,9 +59,24 @@ public class InitCommand implements CommandExecutor {
                 miningZoneManager.initializeMiningZone();
                 break;
 
+            case "arena1":
+                if (arenaManager.isArena1Created()) {
+                    sender.sendMessage("§e⚠ Arena1 đã tồn tại! Bỏ qua...");
+                    return true;
+                }
+
+                sender.sendMessage("§e⏳ Đang tạo Arena1...");
+                sender.sendMessage("§7⚠ Server sẽ lag trong 5-10 giây!");
+
+                arenaManager.createArena1(() -> {
+                    sender.sendMessage("§a✓ Arena1 đã được tạo!");
+                    sender.sendMessage("§7Sử dụng §e/warp arena1 §7để tới đó!");
+                });
+                break;
+
             default:
                 sender.sendMessage("§c❌ Subcommand không hợp lệ!");
-                sender.sendMessage("§7Sử dụng: §e/init [spawnlobby|khumine]");
+                sender.sendMessage("§7Sử dụng: §e/init [spawnlobby|khumine|arena1]");
                 break;
         }
 

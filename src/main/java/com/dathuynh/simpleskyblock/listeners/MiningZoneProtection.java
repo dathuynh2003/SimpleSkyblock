@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
@@ -52,6 +53,29 @@ public class MiningZoneProtection implements Listener {
                 event.getBlock().getType() == Material.TNT_MINECART) {
             event.setCancelled(true);
             event.getPlayer().sendMessage("§cCấm sử dụng TNT trong khu mine!");
+        }
+    }
+
+    /**
+     * Chặn FALL DAMAGE trong spawn
+     */
+    @EventHandler
+    public void onFallDamage(EntityDamageEvent event) {
+        // Chỉ check nếu là player
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        // Chỉ check fall damage
+        if (event.getCause() != EntityDamageEvent.DamageCause.FALL) {
+            return;
+        }
+
+        Player player = (Player) event.getEntity();
+
+        // Nếu player ở trong spawn → cancel fall damage
+        if (miningZoneManager.isInMiningZone(player.getLocation())) {
+            event.setCancelled(true);
         }
     }
 
