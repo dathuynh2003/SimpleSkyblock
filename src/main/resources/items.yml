@@ -106,3 +106,17 @@ items:
       armor: 100.0
       max-health: 40.0
       knockback-resistance: 1.0
+
+  super_iron:
+    material: IRON_INGOT
+    display-name: "§b§lSắt Siêu Cứng"
+    lore:
+      - "§7Sắt siêu cứng được lấy từ"
+      - "§7Người Sắt Khổng Lồ"
+      - ""
+      - "§7Có thể dùng để đổi đồ đặc biệt"
+      - ""
+      - "§e✦ §7Rarity: §dEpic"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true

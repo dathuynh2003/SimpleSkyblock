@@ -47,3 +47,7 @@ commands:
     description: Change your password
     usage: /<command> <oldPassword> <newPassword>
     aliases: [ changepw, chpw ]
+  boss:
+    description: Boss management commands
+    usage: /<command> [info|spawn]
+    aliases: [ b ]

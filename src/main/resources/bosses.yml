@@ -1,0 +1,101 @@
+# Boss Configuration
+# Định nghĩa các boss và thuộc tính của chúng
+
+bosses:
+  # Boss Arena 1
+  arena1_boss:
+    # Basic Info
+    name: "§c§lKhổng lồ sắt"
+    entity-type: IRON_GOLEM
+
+    # Stats
+    health: 2048  # Max HP (Minecraft limit)
+    damage: 15    # Attack damage
+    armor: 20     # Diamond armor level
+    armor-toughness: 12
+    knockback-resistance: 1.0  # 100% immune
+    movement-speed: 0.18
+
+    # TĂNG RANGES
+    follow-range: 64  # Tăng từ 16 → 64 blocks (phát hiện xa hơn)
+    attack-range: 5   # Tăng từ 3 → 5 blocks (đánh xa hơn)
+
+    # AI Settings
+    aggressive: true  # Chủ động tấn công
+    target-range: 64  # Phạm vi phát hiện player (blocks)
+
+    # Potion Effects (Permanent)
+    effects:
+      REGENERATION: 2      # Level (1 = I, 2 = II)
+      DAMAGE_RESISTANCE: 2
+      INCREASE_DAMAGE: 1
+      FIRE_RESISTANCE: 1
+
+    # Attack Effects (áp lên victim)
+    attack-effects:
+      WITHER:
+        duration: 20  # ticks (1 second)
+        level: 2
+      SLOW:
+        duration: 60   # ticks (3 seconds)
+        level: 1
+      fire-ticks: 100  # 5 seconds
+
+    # Enrage Phase (khi HP < 25%)
+    enrage:
+      enabled: true
+      health-percent: 25
+      effects:
+        SPEED: 2
+        INCREASE_DAMAGE: 2
+      broadcast: "§c§l[BOSS] §eKhổng lồ sắt đã BỘC PHÁT!"
+
+    # Spawn Settings
+    spawn-location:
+      world: world_lobby
+      x: 9969
+      y: 79
+      z: 9945
+
+    # Respawn Timer (minutes)
+    respawn-time: 30
+
+    # Rewards
+    rewards:
+      # Top 1
+      rank-1:
+        min: 3
+        max: 5
+        item-id: super_iron  # Reference to items.yml
+
+      # Top 2-3
+      rank-2-3:
+        min: 2
+        max: 4
+        item-id: super_iron
+
+      # Others
+      rank-other:
+        amount: 1
+        item-id: super_iron
+
+    # Announcements
+    announcements:
+      spawn:
+        - "§8§m                                                    "
+        - ""
+        - "         §c§l⚔ KHỔNG LỒ SẮT ĐÃ XUẤT HIỆN! ⚔"
+        - ""
+        - "  §7Sử dụng §e/warp arena1 §7để tham gia chiến đấu!"
+        - "  §7Phần thưởng: §bSắt Siêu Cứng §7(3-5 cho Top 1)"
+        - ""
+        - "§8§m                                                    "
+
+      death:
+        - "§8§m                                                    "
+        - ""
+        - "       §c§l⚔ KHỔNG LỒ SẮT ĐÃ BỊ ĐÁNH BẠI! ⚔"
+        - ""
+        - "  §6§l⚡ TOP DAMAGE:"
+
+      respawn-notice: "  §7Boss sẽ hồi sinh sau §e30 phút§7!"

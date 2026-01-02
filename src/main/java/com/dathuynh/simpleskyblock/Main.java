@@ -16,10 +16,12 @@ public class Main extends JavaPlugin {
     private SpawnManager spawnManager;
     private NPCManager npcManager;
     private ConfigLoader configLoader;
+    private ItemManager itemManager;
     private IslandManager islandManager;
     private MiningZoneManager miningZoneManager;
     private AuthManager authManager;
     private ArenaManager arenaManager;
+    private BossManager bossManager;
 
     private KitCommand kitCommand;
     private int autoSaveTaskId;
@@ -30,6 +32,7 @@ public class Main extends JavaPlugin {
 
         // Load configs TRƯỚC
         configLoader = new ConfigLoader(this);
+        itemManager = new ItemManager(this);
         KitConfig kitConfig = new KitConfig(this);
 
         // Managers
@@ -39,6 +42,7 @@ public class Main extends JavaPlugin {
         islandManager = new IslandManager(this);
         miningZoneManager = new MiningZoneManager(this);
         arenaManager = new ArenaManager(this);
+        bossManager = new BossManager(this, arenaManager, itemManager);
 
         // Commands
         IslandCommand islandCommand = new IslandCommand(this, islandManager);
@@ -52,6 +56,7 @@ public class Main extends JavaPlugin {
         getCommand("restart").setExecutor(new RestartCommand(this));
         getCommand("tp").setExecutor(new TeleportCommand());
         getCommand("kit").setExecutor(kitCommand);
+        getCommand("boss").setExecutor(new BossCommand(bossManager));
 
         // Auth commands
         getCommand("register").setExecutor(new AuthCommand(authManager, "register"));
@@ -69,6 +74,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new IslandPvPProtection(islandManager), this);
         getServer().getPluginManager().registerEvents(new MiningZoneProtection(miningZoneManager), this);
         getServer().getPluginManager().registerEvents(new ArenaProtection(arenaManager), this);
+        getServer().getPluginManager().registerEvents(new BossListener(bossManager, arenaManager), this);
         // Load kit data
         loadKitData();
 
@@ -103,11 +109,19 @@ public class Main extends JavaPlugin {
             miningZoneManager.stopAutoReset();
         }
 
+        if (bossManager != null) {
+            bossManager.shutdown();
+        }
+
         getLogger().info("SimpleSkyblock plugin đã tắt!");
     }
 
     public ConfigLoader getConfigLoader() {
         return configLoader;
+    }
+
+    public ItemManager getItemManager() {
+        return itemManager;
     }
 
     private void startAutoSave() {
@@ -209,6 +223,10 @@ public class Main extends JavaPlugin {
         } catch (java.io.IOException e) {
             getLogger().severe("Lỗi save kit data: " + e.getMessage());
         }
+    }
+
+    public BossManager getBossManager() {
+        return bossManager;
     }
 
 }
