@@ -24,12 +24,21 @@ bosses:
     aggressive: true  # Chủ động tấn công
     target-range: 64  # Phạm vi phát hiện player (blocks)
 
+    # Ranged Attack Skill
+    ranged-attack:
+      enabled: true
+      cooldown: 80        # ticks (4 seconds)
+      range: 20           # blocks
+      damage: 10
+      projectile-speed: 1.5
+      particle: FLAME
+
     # Potion Effects (Permanent)
     effects:
       REGENERATION: 2      # Level (1 = I, 2 = II)
       DAMAGE_RESISTANCE: 2
       INCREASE_DAMAGE: 1
-      FIRE_RESISTANCE: 1
+      FIRE_RESISTANCE: 10
 
     # Attack Effects (áp lên victim)
     attack-effects:

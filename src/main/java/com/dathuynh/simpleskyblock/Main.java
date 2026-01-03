@@ -68,7 +68,7 @@ public class Main extends JavaPlugin {
         // Event Listeners
         getServer().getPluginManager().registerEvents(new AuthListener(authManager, this), this);
         getServer().getPluginManager().registerEvents(new SpawnProtection(), this);
-        getServer().getPluginManager().registerEvents(new JoinListener(spawnManager, this), this);
+        getServer().getPluginManager().registerEvents(new JoinListener(spawnManager, this, bossManager), this);
         getServer().getPluginManager().registerEvents(new IslandProtection(islandManager), this);
         getServer().getPluginManager().registerEvents(npcManager, this);
         getServer().getPluginManager().registerEvents(new TradeMenuListener(configLoader), this);

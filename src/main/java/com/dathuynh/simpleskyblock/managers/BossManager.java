@@ -5,8 +5,13 @@ import com.dathuynh.simpleskyblock.models.BossData;
 import com.dathuynh.simpleskyblock.utils.BossConfig;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -25,6 +30,11 @@ public class BossManager {
 
     private int healthBarTaskId = -1;
     private int aggressiveAITaskId = -1;
+
+    private BossBar healthBossBar;
+    private int bossBarTaskId = -1;
+
+    private int enrageExplosionTaskId = -1;
 
     private static final String BOSS_ID = "arena1_boss";
 
@@ -101,6 +111,9 @@ public class BossManager {
         boss.setRemoveWhenFarAway(false);
         boss.setPersistent(true);
 
+        // Create BossBar for health display
+        createHealthBossBar();
+
         // Save boss data
         bossData.setBoss(boss);
         bossData.resetDamageTracker();
@@ -117,6 +130,77 @@ public class BossManager {
         }
 
         plugin.getLogger().info("Boss '" + BOSS_ID + "' spawned at Arena1 with follow-range=" + followRange);
+    }
+
+    private void createHealthBossBar() {
+        String bossName = bossConfig.getBossName(BOSS_ID);
+
+        healthBossBar = Bukkit.createBossBar(
+                bossName + " §c❤ §e100%",
+                BarColor.RED,
+                BarStyle.SEGMENTED_10
+        );
+
+        // Add all online players
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            healthBossBar.addPlayer(player);
+        }
+
+        healthBossBar.setVisible(true);
+        healthBossBar.setProgress(1.0);
+
+        startBossBarUpdater();
+    }
+
+    private void startBossBarUpdater() {
+        bossBarTaskId = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!bossData.isAlive() || healthBossBar == null) {
+                    if (healthBossBar != null) {
+                        healthBossBar.removeAll();
+                        healthBossBar = null;
+                    }
+                    cancel();
+                    return;
+                }
+
+                IronGolem boss = bossData.getBoss();
+                if (boss == null || boss.isDead()) {
+                    healthBossBar.removeAll();
+                    healthBossBar = null;
+                    cancel();
+                    return;
+                }
+
+                double health = boss.getHealth();
+                double maxHealth = boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
+                double progress = health / maxHealth;
+                double percent = progress * 100;
+
+                String bossName = bossConfig.getBossName(BOSS_ID);
+                healthBossBar.setTitle(String.format("%s §c❤ §e%.0f§7/§e%.0f §7(§c%.1f%%§7)",
+                        bossName, health, maxHealth, percent));
+                healthBossBar.setProgress(Math.max(0.0, Math.min(1.0, progress)));
+
+                // Update color based on health
+                if (percent > 50) {
+                    healthBossBar.setColor(BarColor.GREEN);
+                } else if (percent > 25) {
+                    healthBossBar.setColor(BarColor.YELLOW);
+                } else {
+                    healthBossBar.setColor(BarColor.RED);
+                }
+
+            }
+        }.runTaskTimer(plugin, 0L, 10L).getTaskId(); // Update every 0.5s
+    }
+
+    // Add players when they join
+    public void addPlayerToBossBar(Player player) {
+        if (healthBossBar != null && bossData.isAlive()) {
+            healthBossBar.addPlayer(player);
+        }
     }
 
     /**
@@ -215,8 +299,7 @@ public class BossManager {
             }
 
             Bukkit.broadcastMessage("");
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&',
-                    bossConfig.getRespawnNotice(BOSS_ID)));
+            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', bossConfig.getRespawnNotice(BOSS_ID)));
             Bukkit.broadcastMessage("");
             Bukkit.broadcastMessage("§8§m                                                    ");
 
@@ -432,10 +515,8 @@ public class BossManager {
         }.runTaskTimer(plugin, 0L, 20L).getTaskId();
     }
 
-    /**
-     * Aggressive AI - Boss actively targets players
-     * ← FIX: CHỈ FIND TARGET, KHÔNG DAMAGE (để BossListener xử lý)
-     */
+    private Map<UUID, Long> lastRangedAttack = new HashMap<>();
+
     private void startAggressiveAI() {
         aggressiveAITaskId = new BukkitRunnable() {
             @Override
@@ -446,63 +527,105 @@ public class BossManager {
                 IronGolem boss = bossData.getBoss();
                 if (boss == null || boss.isDead()) return;
 
-                // Find & target nearest player
-                Player currentTarget = null;
+                Player target = findNearestTarget(boss);
 
-                // Check existing target
-                if (boss.getTarget() != null && boss.getTarget() instanceof Player) {
-                    currentTarget = (Player) boss.getTarget();
-                    if (!currentTarget.isOnline() || currentTarget.isDead() ||
-                            currentTarget.getGameMode() == GameMode.CREATIVE ||
-                            currentTarget.getGameMode() == GameMode.SPECTATOR) {
-                        currentTarget = null; // Invalid target
-                    }
-                }
+                if (target != null) {
+                    boss.setTarget(target);
 
-                // Find new target if needed
-                if (currentTarget == null) {
-                    double targetRange = bossConfig.getTargetRange(BOSS_ID);
-                    Location bossLoc = boss.getLocation();
-                    Player nearestPlayer = null;
-                    double nearestDistance = targetRange;
+                    double distance = target.getLocation().distance(boss.getLocation());
 
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        if (player.getGameMode() == GameMode.CREATIVE ||
-                                player.getGameMode() == GameMode.SPECTATOR) {
-                            continue;
-                        }
-
-                        if (!player.getWorld().equals(boss.getWorld())) continue;
-
-                        double distance = player.getLocation().distance(bossLoc);
-                        if (distance < nearestDistance) {
-                            nearestDistance = distance;
-                            nearestPlayer = player;
+                    // Use ranged attack if too far
+                    if (distance > 5 && distance <= bossConfig.getRangedRange(BOSS_ID)) {
+                        if (canUseRangedAttack(boss)) {
+                            performRangedAttack(boss, target);
                         }
                     }
-
-                    // Set new target
-                    if (nearestPlayer != null) {
-                        boss.setTarget(nearestPlayer);
-                    }
                 }
-
-                // ← NOTE: KHÔNG DAMAGE Ở ĐÂY!
-                // Attack được handle bởi BossListener.onBossAttack()
-                // → Damage được track đúng qua EntityDamageByEntityEvent
             }
-        }.runTaskTimer(plugin, 20L, 40L).getTaskId(); // Every 2 seconds
+        }.runTaskTimer(plugin, 20L, 40L).getTaskId();
+    }
+
+    private Player findNearestTarget(IronGolem boss) {
+        if (boss.getTarget() instanceof Player) {
+            Player current = (Player) boss.getTarget();
+            if (current.isOnline() && !current.isDead() &&
+                    current.getGameMode() != GameMode.CREATIVE &&
+                    current.getGameMode() != GameMode.SPECTATOR &&
+                    current.getWorld().equals(boss.getWorld())) {
+                return current;
+            }
+        }
+
+        double targetRange = bossConfig.getTargetRange(BOSS_ID);
+        Location bossLoc = boss.getLocation();
+        Player nearest = null;
+        double nearestDist = targetRange;
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.getGameMode() == GameMode.CREATIVE ||
+                    p.getGameMode() == GameMode.SPECTATOR) continue;
+            if (!p.getWorld().equals(boss.getWorld())) continue;
+
+            double dist = p.getLocation().distance(bossLoc);
+            if (dist < nearestDist) {
+                nearestDist = dist;
+                nearest = p;
+            }
+        }
+
+        return nearest;
+    }
+
+    private boolean canUseRangedAttack(IronGolem boss) {
+        if (!bossConfig.isRangedAttackEnabled(BOSS_ID)) return false;
+
+        UUID bossId = boss.getUniqueId();
+        long now = System.currentTimeMillis();
+        long cooldown = bossConfig.getRangedCooldown(BOSS_ID) * 50L; // ticks to ms
+
+        if (!lastRangedAttack.containsKey(bossId)) {
+            lastRangedAttack.put(bossId, now);
+            return true;
+        }
+
+        long last = lastRangedAttack.get(bossId);
+        if (now - last >= cooldown) {
+            lastRangedAttack.put(bossId, now);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void performRangedAttack(IronGolem boss, Player target) {
+        Location eyeLoc = boss.getEyeLocation();
+        org.bukkit.util.Vector direction = target.getEyeLocation()
+                .subtract(eyeLoc)
+                .toVector()
+                .normalize();
+
+        Snowball projectile = boss.getWorld().spawn(eyeLoc, Snowball.class);
+        projectile.setShooter(boss);
+        projectile.setVelocity(direction.multiply(bossConfig.getRangedRange(BOSS_ID) / 10));
+        projectile.setCustomName("§cBoss Fireball");
+
+        // Visual effects
+        boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 0.8f);
+        boss.getWorld().spawnParticle(Particle.FLAME, eyeLoc, 20, 0.3, 0.3, 0.3, 0.05);
     }
 
     /**
      * Stop tasks on disable
      */
     public void shutdown() {
-        if (healthBarTaskId != -1) {
-            Bukkit.getScheduler().cancelTask(healthBarTaskId);
-        }
-        if (aggressiveAITaskId != -1) {
-            Bukkit.getScheduler().cancelTask(aggressiveAITaskId);
+        if (healthBarTaskId != -1) Bukkit.getScheduler().cancelTask(healthBarTaskId);
+        if (aggressiveAITaskId != -1) Bukkit.getScheduler().cancelTask(aggressiveAITaskId);
+        if (bossBarTaskId != -1) Bukkit.getScheduler().cancelTask(bossBarTaskId);
+        if (enrageExplosionTaskId != -1) Bukkit.getScheduler().cancelTask(enrageExplosionTaskId);
+
+        if (healthBossBar != null) {
+            healthBossBar.removeAll();
+            healthBossBar = null;
         }
     }
 
@@ -525,5 +648,55 @@ public class BossManager {
      */
     public void reloadConfig() {
         bossConfig.reload();
+    }
+
+    public void startEnrageExplosions(IronGolem boss) {
+        if (enrageExplosionTaskId != -1) {
+            return; // Already active
+        }
+
+        enrageExplosionTaskId = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!bossData.isAlive() || boss.isDead()) {
+                    cancel();
+                    enrageExplosionTaskId = -1;
+                    return;
+                }
+
+                Location bossLoc = boss.getLocation();
+                World world = bossLoc.getWorld();
+
+                // Explosion effect without terrain damage
+                world.spawnParticle(Particle.EXPLOSION_LARGE, bossLoc, 10, 2.5, 0.5, 2.5);
+                world.playSound(bossLoc, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0.8f);
+
+                // Damage nearby players in 5x5 area
+                for (Entity entity : world.getNearbyEntities(bossLoc, 5, 3, 5)) {
+                    if (entity instanceof Player) {
+                        Player victim = (Player) entity;
+
+                        if (victim.getGameMode() == GameMode.CREATIVE ||
+                                victim.getGameMode() == GameMode.SPECTATOR) {
+                            continue;
+                        }
+
+                        double distance = victim.getLocation().distance(bossLoc);
+                        double damage = 15 * (1 - (distance / 5)); // 15 damage at center, scaling down
+
+                        victim.damage(damage, boss);
+                        victim.setVelocity(victim.getLocation().subtract(bossLoc)
+                                .toVector().normalize().multiply(1.5).setY(0.5));
+
+                        victim.sendMessage("§c§l⚡ Boss Enrage Explosion!");
+                        victim.playSound(victim.getLocation(), Sound.ENTITY_PLAYER_HURT, 1.0f, 0.8f);
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 60L, 60L).getTaskId(); // Every 3 seconds
+    }
+
+    public BossConfig getBossConfig() {
+        return bossConfig;
     }
 }

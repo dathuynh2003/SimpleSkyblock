@@ -11,9 +11,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
@@ -128,6 +126,7 @@ public class BossListener implements Listener {
             double maxHealth = boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
             double healthPercent = (healthAfter / maxHealth) * 100;
 
+            // Trong onBossDamageActual(), thay thế phần enrage check:
             if (healthPercent < 25 && !boss.hasPotionEffect(PotionEffectType.SPEED)) {
                 boss.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 1));
                 boss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
@@ -137,6 +136,9 @@ public class BossListener implements Listener {
 
                 boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0f, 0.5f);
                 boss.getWorld().spawnParticle(Particle.LAVA, boss.getLocation(), 100, 2, 2, 2);
+
+                // Start enrage explosion task
+                bossManager.startEnrageExplosions(boss);
             }
 
             // Cleanup
@@ -144,6 +146,42 @@ public class BossListener implements Listener {
             lastHealthBefore.remove(bossUUID);
 
         }, 1L); // Wait 1 tick
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBossEffectApply(EntityPotionEffectEvent event) {
+        if (!(event.getEntity() instanceof IronGolem)) return;
+
+        IronGolem golem = (IronGolem) event.getEntity();
+        IronGolem boss = bossManager.getBoss();
+
+        if (boss == null || !golem.equals(boss)) return;
+
+        // Block negative effects
+        PotionEffectType type = event.getModifiedType();
+        if (type != null && (
+                type.equals(PotionEffectType.SLOW) ||
+                        type.equals(PotionEffectType.SLOW_DIGGING) ||
+                        type.equals(PotionEffectType.WEAKNESS) ||
+                        type.equals(PotionEffectType.POISON) ||
+                        type.equals(PotionEffectType.WITHER)
+        )) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBossKnockback(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof IronGolem)) return;
+
+        IronGolem boss = bossManager.getBoss();
+        if (boss != null && event.getEntity().equals(boss)) {
+            // Already immune via KNOCKBACK_RESISTANCE = 1.0
+            // But ensure no velocity change
+            Bukkit.getScheduler().runTask(bossManager.getPlugin(), () -> {
+                boss.setVelocity(new org.bukkit.util.Vector(0, 0, 0));
+            });
+        }
     }
 
     /**
@@ -184,66 +222,27 @@ public class BossListener implements Listener {
         }, 1L);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
-    public void onBossAttack(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof IronGolem)) return;
+    @EventHandler
+    public void onBossProjectileHit(ProjectileHitEvent event) {
+        if (!(event.getEntity() instanceof Snowball)) return;
 
-        IronGolem damaged = (IronGolem) event.getEntity();
-        IronGolem boss = bossManager.getBoss();
+        Snowball snowball = (Snowball) event.getEntity();
+        if (snowball.getCustomName() == null ||
+                !snowball.getCustomName().contains("Boss Fireball")) return;
 
-        // ← DEBUG CHECK
-        if (boss == null) {
-            Bukkit.getLogger().severe("[BossListener] ❌ getBoss() returned NULL!");
-            return;
-        }
+        if (!(snowball.getShooter() instanceof IronGolem)) return;
 
-        if (!boss.equals(damaged)) return;
+        if (event.getHitEntity() instanceof Player) {
+            Player victim = (Player) event.getHitEntity();
+            double damage = bossManager.getBossConfig().getRangedDamage("arena1_boss");
 
-        // ← FIX: Ensure chunk is loaded
-        if (!boss.getLocation().getChunk().isLoaded()) {
-            boss.getLocation().getChunk().load();
-            Bukkit.getLogger().warning("[BossListener] 🔄 Loaded boss chunk on damage event");
-        }
+            victim.damage(damage);
+            victim.setFireTicks(60);
+            victim.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 40, 1));
 
-        // Get player attacker
-        Player player = null;
-
-        if (event.getDamager() instanceof Player) {
-            player = (Player) event.getDamager();
-        } else if (event.getDamager() instanceof Projectile) {
-            Projectile projectile = (Projectile) event.getDamager();
-            ProjectileSource shooter = projectile.getShooter();
-            if (shooter instanceof Player) {
-                player = (Player) shooter;
-            }
-        }
-
-        if (player == null) {
-            Bukkit.getLogger().warning("[DEBUG] ⚠️ No player found for boss damage!");
-            return;
-        }
-
-        double damage = event.getFinalDamage();
-        if (damage <= 0) {
-            damage = event.getDamage();
-        }
-
-        bossManager.trackDamage(player, damage);
-
-        // Enrage phase
-        double health = boss.getHealth() - damage;
-        double maxHealth = boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
-        double healthPercent = (health / maxHealth) * 100;
-
-        if (healthPercent < 25 && !boss.hasPotionEffect(PotionEffectType.SPEED)) {
-            boss.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 1));
-            boss.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
-
-            Bukkit.broadcastMessage("§c§l[BOSS] §eKhổng lồ sắt đã BỘC PHÁT!");
-            Bukkit.broadcastMessage("§7Boss tăng tốc độ và sát thương!");
-
-            boss.getWorld().playSound(boss.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 2.0f, 0.5f);
-            boss.getWorld().spawnParticle(Particle.LAVA, boss.getLocation(), 100, 2, 2, 2);
+            // Effects
+            victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 1.0f);
+            victim.getWorld().spawnParticle(Particle.FLAME, victim.getLocation(), 30, 0.5, 0.5, 0.5);
         }
     }
 

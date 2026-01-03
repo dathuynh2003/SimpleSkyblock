@@ -1,5 +1,6 @@
 package com.dathuynh.simpleskyblock.listeners;
 
+import com.dathuynh.simpleskyblock.managers.BossManager;
 import com.dathuynh.simpleskyblock.managers.SpawnManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,11 +12,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class JoinListener implements Listener {
 
     private SpawnManager spawnManager;
+    private BossManager bossManager;
     private JavaPlugin plugin;
 
-    public JoinListener(SpawnManager spawnManager, JavaPlugin plugin) {
+    public JoinListener(SpawnManager spawnManager, JavaPlugin plugin, BossManager bossManager) {
         this.spawnManager = spawnManager;
         this.plugin = plugin;
+        this.bossManager = bossManager;
     }
 
     @EventHandler
@@ -34,6 +37,8 @@ public class JoinListener implements Listener {
                 player.sendMessage("§7Sử dụng §e/spawn §7để quay về lobby!");
                 player.sendMessage("§6═══════════════════════════════");
             }, 10L);
+
+            bossManager.addPlayerToBossBar(event.getPlayer());
         }
     }
 }

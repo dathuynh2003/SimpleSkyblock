@@ -158,4 +158,21 @@ public class BossConfig {
     public double getAttackRange(String bossId) {
         return config.getDouble("bosses." + bossId + ".attack-range", 3);
     }
+
+    public boolean isRangedAttackEnabled(String bossId) {
+        return config.getBoolean("bosses." + bossId + ".ranged-attack.enabled", false);
+    }
+
+    public int getRangedCooldown(String bossId) {
+        return config.getInt("bosses." + bossId + ".ranged-attack.cooldown", 80);
+    }
+
+    public double getRangedRange(String bossId) {
+        return config.getDouble("bosses." + bossId + ".ranged-attack.range", 20);
+    }
+
+    public double getRangedDamage(String bossId) {
+        return config.getDouble("bosses." + bossId + ".ranged-attack.damage", 10);
+    }
+
 }
