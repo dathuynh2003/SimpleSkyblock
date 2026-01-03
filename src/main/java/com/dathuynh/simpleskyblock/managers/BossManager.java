@@ -1,6 +1,7 @@
 package com.dathuynh.simpleskyblock.managers;
 
 import com.dathuynh.simpleskyblock.Main;
+import com.dathuynh.simpleskyblock.listeners.BossBarVisibilityListener;
 import com.dathuynh.simpleskyblock.models.BossData;
 import com.dathuynh.simpleskyblock.utils.BossConfig;
 import org.bukkit.*;
@@ -36,6 +37,12 @@ public class BossManager {
 
     private int enrageExplosionTaskId = -1;
 
+    private BossBarVisibilityListener visibilityListener;
+
+    public void setVisibilityListener(BossBarVisibilityListener listener) {
+        this.visibilityListener = listener;
+    }
+
     private static final String BOSS_ID = "arena1_boss";
 
     public BossManager(Main plugin, ArenaManager arenaManager, ItemManager itemManager) {
@@ -68,7 +75,7 @@ public class BossManager {
         World world = spawnLoc.getWorld();
         if (world == null) return;
 
-        //  Force load chunk
+        // Force load chunk
         spawnLoc.getChunk().load();
         spawnLoc.getChunk().setForceLoaded(true);
         plugin.getLogger().info("✅ Boss chunk force-loaded!");
@@ -111,12 +118,17 @@ public class BossManager {
         boss.setRemoveWhenFarAway(false);
         boss.setPersistent(true);
 
-        // Create BossBar for health display
-        createHealthBossBar();
-
         // Save boss data
         bossData.setBoss(boss);
         bossData.resetDamageTracker();
+
+        // ✅ FIX: Clear cache TRƯỚC KHI tạo BossBar
+        if (visibilityListener != null) {
+            visibilityListener.clearCache();
+        }
+
+        // Create BossBar for health display
+        createHealthBossBar();
 
         // Announce spawn from config
         List<String> announcement = bossConfig.getSpawnAnnouncement(BOSS_ID);
@@ -141,9 +153,23 @@ public class BossManager {
                 BarStyle.SEGMENTED_10
         );
 
-        // Add all online players
+        plugin.getLogger().info("[BossBar] === Checking players for initial BossBar ===");
+
+        //Khởi tạo: Chỉ add player đang ở arena
         for (Player player : Bukkit.getOnlinePlayers()) {
-            healthBossBar.addPlayer(player);
+            Location loc = player.getLocation();
+            boolean inArena = arenaManager.isInArena(loc);
+
+            plugin.getLogger().info("[BossBar] Player: " + player.getName() +
+                    " | Loc: " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() +
+                    " | InArena: " + inArena);
+
+            if (inArena) {
+                healthBossBar.addPlayer(player);
+                plugin.getLogger().info("[BossBar] ✅ Added " + player.getName() + " to BossBar");
+            } else {
+                plugin.getLogger().info("[BossBar] ⏭ Skipped " + player.getName() + " (not in arena)");
+            }
         }
 
         healthBossBar.setVisible(true);
@@ -196,12 +222,34 @@ public class BossManager {
         }.runTaskTimer(plugin, 0L, 10L).getTaskId(); // Update every 0.5s
     }
 
+    public void updateBossBarVisibility(Player player) {
+        if (healthBossBar == null || !bossData.isAlive()) {
+            return;
+        }
+
+        boolean inArena = arenaManager.isInArena(player.getLocation());
+        boolean hasBar = healthBossBar.getPlayers().contains(player);
+
+        if (inArena && !hasBar) {
+            // Vào arena → add BossBar
+            healthBossBar.addPlayer(player);
+            plugin.getLogger().info("[BossBar] ✅ Added " + player.getName());
+        } else if (!inArena && hasBar) {
+            // Rời arena → remove BossBar
+            healthBossBar.removePlayer(player);
+            plugin.getLogger().info("[BossBar] ❌ Removed " + player.getName());
+        }
+    }
+
     // Add players when they join
     public void addPlayerToBossBar(Player player) {
         if (healthBossBar != null && bossData.isAlive()) {
-            healthBossBar.addPlayer(player);
+            if (arenaManager.isInArena(player.getLocation())) {
+                healthBossBar.addPlayer(player);
+            }
         }
     }
+
 
     /**
      * Handle boss death - FIX NULL PLAYER BUG
@@ -307,6 +355,16 @@ public class BossManager {
             bossData.setAlive(false);
             bossData.setLastDeathTime(System.currentTimeMillis());
             bossData.resetDamageTracker();
+
+            if (healthBossBar != null) {
+                healthBossBar.removeAll();
+                healthBossBar.setVisible(false);
+                healthBossBar = null;
+            }
+
+            if (visibilityListener != null) {
+                visibilityListener.clearCache();
+            }
 
             plugin.getLogger().info("[BossManager] handleBossDeath() END (success)");
             plugin.getLogger().info("═══════════════════════════════════");
@@ -494,22 +552,6 @@ public class BossManager {
                 if (!boss.getLocation().getChunk().isLoaded()) {
                     boss.getLocation().getChunk().load();
                     plugin.getLogger().info("[BossManager] 🔄 Loaded boss chunk");
-                }
-
-                double health = boss.getHealth();
-                double maxHealth = boss.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
-
-                double healthPercent = (health / maxHealth) * 100;
-                String healthBar = String.format("§c§l⚔ Khổng lồ sắt §c❤ §e%.0f§7/§e%.0f §7(§c%.1f%%§7)",
-                        health, maxHealth, healthPercent);
-
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (arenaManager.isInArena(player.getLocation())) {
-                        player.spigot().sendMessage(
-                                net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
-                                new net.md_5.bungee.api.chat.TextComponent(healthBar)
-                        );
-                    }
                 }
             }
         }.runTaskTimer(plugin, 0L, 20L).getTaskId();

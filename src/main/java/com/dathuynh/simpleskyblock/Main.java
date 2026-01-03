@@ -79,6 +79,10 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BossListener(bossManager, arenaManager), this);
         getServer().getPluginManager().registerEvents(new NetherProtection(netherZoneManager), this);
         getServer().getPluginManager().registerEvents(new NetherZoneListener(this, netherZoneManager), this);
+        getServer().getPluginManager().registerEvents(new IslandBedListener(islandManager), this);
+        BossBarVisibilityListener bossBarListener = new BossBarVisibilityListener(bossManager, arenaManager);
+        getServer().getPluginManager().registerEvents(bossBarListener, this);
+        bossManager.setVisibilityListener(bossBarListener);
 
         // Load kit data
         loadKitData();

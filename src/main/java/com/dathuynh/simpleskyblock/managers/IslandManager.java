@@ -68,6 +68,7 @@ public class IslandManager {
 
             dataConfig.set(path + ".owner", island.getOwner().toString());
             dataConfig.set(path + ".location", island.getLocation());
+            dataConfig.set(path + ".home-location", island.getHomeLocation());
 
             List<String> membersList = new ArrayList<>();
             for (UUID member : island.getMembers()) {
@@ -110,6 +111,14 @@ public class IslandManager {
 
                 // Tạo island object
                 Island island = new Island(ownerUuid, location);
+
+                // Load homeLocation
+                if (dataConfig.contains(path + ".home-location")) {
+                    Location homeLocation = dataConfig.getLocation(path + ".home-location");
+                    if (homeLocation != null) {
+                        island.setHomeLocation(homeLocation);
+                    }
+                }
 
                 // Load members
                 List<String> membersList = dataConfig.getStringList(path + ".members");
@@ -355,7 +364,28 @@ public class IslandManager {
 
     public Location getIslandHome(UUID playerUuid) {
         Island island = getIsland(playerUuid);
-        return island != null ? island.getLocation() : null;
+        return island != null ? island.getHomeLocation() : null;
+    }
+
+    public boolean setIslandHome(UUID playerUuid, Location newHome) {
+        Island island = getIsland(playerUuid);
+
+        if (island == null) {
+            return false;
+        }
+
+        if (!island.isOwner(playerUuid)) {
+            return false; // Chỉ owner mới set được
+        }
+
+        // Check location có trong island không
+        if (!isLocationInIsland(newHome, island.getLocation())) {
+            return false;
+        }
+
+        island.setHomeLocation(newHome);
+        saveData();
+        return true;
     }
 
     public long getRemainingCooldown(UUID playerUuid) {

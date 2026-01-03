@@ -64,6 +64,9 @@ public class IslandCommand implements CommandExecutor {
             case "leave":
                 handleLeave(player);
                 break;
+            case "sethome": // ✅ Thêm lệnh mới
+                handleSetHome(player);
+                break;
             default:
                 showHelp(player);
         }
@@ -77,6 +80,7 @@ public class IslandCommand implements CommandExecutor {
         player.sendMessage("§e/is create §7- Tạo đảo mới");
         player.sendMessage("§e/is delete §7- Xóa đảo (24h cooldown)");
         player.sendMessage("§e/is info §7- Thông tin đảo");
+        player.sendMessage("§e/is sethome §7- Đặt điểm spawn mới (chủ đảo)");
         player.sendMessage("§e/is invite <tên> §7- Mời người chơi vào đảo");
         player.sendMessage("§e/is accept <tên> §7- Chấp nhận lời mời");
         player.sendMessage("§e/is leave §7- Rời khỏi đảo (chỉ member)");
@@ -147,6 +151,39 @@ public class IslandCommand implements CommandExecutor {
         long daysSince = (System.currentTimeMillis() - island.getCreatedTime()) / (24 * 60 * 60 * 1000);
         player.sendMessage("§eTuổi đảo: §f" + daysSince + " ngày");
         player.sendMessage("§eGiới hạn: §f100x100 blocks");
+    }
+
+    private void handleSetHome(Player player) {
+        Island island = islandManager.getIsland(player.getUniqueId());
+
+        if (island == null) {
+            player.sendMessage("§cBạn chưa có đảo!");
+            return;
+        }
+
+        if (!island.isOwner(player.getUniqueId())) {
+            player.sendMessage("§cChỉ chủ đảo mới có thể đặt spawn point!");
+            return;
+        }
+
+        Location playerLoc = player.getLocation();
+
+        // Check có trong island không
+        if (!islandManager.isLocationInIsland(playerLoc, island.getLocation())) {
+            player.sendMessage("§cBạn phải đứng trong đảo của mình để đặt spawn point!");
+            return;
+        }
+
+        boolean success = islandManager.setIslandHome(player.getUniqueId(), playerLoc);
+
+        if (success) {
+            player.sendMessage("§a✓ Đã đặt spawn point mới tại vị trí hiện tại!");
+            player.sendMessage("§7Tọa độ: §e" + playerLoc.getBlockX() + ", " +
+                    playerLoc.getBlockY() + ", " + playerLoc.getBlockZ());
+            player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
+        } else {
+            player.sendMessage("§cKhông thể đặt spawn point!");
+        }
     }
 
     private void handleInvite(Player player, String[] args) {

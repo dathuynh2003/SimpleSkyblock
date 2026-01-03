@@ -7,6 +7,7 @@ import java.util.*;
 public class Island {
     private UUID owner;
     private Location location;
+    private Location homeLocation;
     private Set<UUID> members;
     private long createdTime;
     private long deletedTime; // 0 nếu chưa xóa
@@ -14,6 +15,7 @@ public class Island {
     public Island(UUID owner, Location location) {
         this.owner = owner;
         this.location = location;
+        this.homeLocation = location.clone();
         this.members = new HashSet<>();
         this.members.add(owner); // Owner cũng là member
         this.createdTime = System.currentTimeMillis();
@@ -27,6 +29,14 @@ public class Island {
 
     public Location getLocation() {
         return location;
+    }
+
+    public Location getHomeLocation() {
+        return homeLocation != null ? homeLocation : location;
+    }
+
+    public void setHomeLocation(Location homeLocation) {
+        this.homeLocation = homeLocation;
     }
 
     public Set<UUID> getMembers() {

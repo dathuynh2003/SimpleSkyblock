@@ -27,20 +27,37 @@ public class ArenaManager {
     private Main plugin;
     private World arenaWorld;
 
-    // Arena1 coordinates
-    private static final int ARENA1_X = 10000;
-    private static final int ARENA1_Y = 100;
-    private static final int ARENA1_Z = 10000;
-    private static final double ARENA1_CENTER_X = ARENA1_X - 31 + 0.5;
-    private static final double ARENA1_CENTER_Y = ARENA1_Y - 20;
-    private static final double ARENA1_CENTER_Z = ARENA1_Z - 32 + 0.5;
-    private static final int ARENA1_SIZE_X = 50;
-    private static final int ARENA1_SIZE_Y = 30;
-    private static final int ARENA1_SIZE_Z = 50;
+    // ✅ Arena1 coordinates - UPDATED FROM MEASUREMENT
+    private static final int ARENA1_PASTE_X = 10000;
+    private static final int ARENA1_PASTE_Y = 100;
+    private static final int ARENA1_PASTE_Z = 10000;
+
+    // ✅ Measured bounds
+    private static final int ARENA1_MIN_X = 9936;
+    private static final int ARENA1_MAX_X = 10000;
+    private static final int ARENA1_MIN_Y = 78;
+    private static final int ARENA1_MAX_Y = 100;
+    private static final int ARENA1_MIN_Z = 9936;
+    private static final int ARENA1_MAX_Z = 10000;
+
+    // ✅ Calculated center (for boss spawn)
+    private static final double ARENA1_CENTER_X = (ARENA1_MIN_X + ARENA1_MAX_X) / 2.0; // 9968.0
+    private static final double ARENA1_CENTER_Y = ARENA1_MIN_Y + 3; // 81.0
+    private static final double ARENA1_CENTER_Z = (ARENA1_MIN_Z + ARENA1_MAX_Z) / 2.0; // 9968.0
 
     public ArenaManager(Main plugin) {
         this.plugin = plugin;
         this.arenaWorld = Bukkit.getWorld("world_lobby");
+
+        // ✅ Debug: Log arena bounds
+        plugin.getLogger().info("═══════════════════════════════════");
+        plugin.getLogger().info("Arena1 Configuration:");
+        plugin.getLogger().info("  Paste Origin: (" + ARENA1_PASTE_X + ", " + ARENA1_PASTE_Y + ", " + ARENA1_PASTE_Z + ")");
+        plugin.getLogger().info("  Center: (" + ARENA1_CENTER_X + ", " + ARENA1_CENTER_Y + ", " + ARENA1_CENTER_Z + ")");
+        plugin.getLogger().info("  Bounds X: [" + ARENA1_MIN_X + " to " + ARENA1_MAX_X + "] (64 blocks)");
+        plugin.getLogger().info("  Bounds Y: [" + ARENA1_MIN_Y + " to " + ARENA1_MAX_Y + "] (22 blocks)");
+        plugin.getLogger().info("  Bounds Z: [" + ARENA1_MIN_Z + " to " + ARENA1_MAX_Z + "] (64 blocks)");
+        plugin.getLogger().info("═══════════════════════════════════");
     }
 
     /**
@@ -52,7 +69,7 @@ public class ArenaManager {
         // Check center block của arena (thường là solid block, không phải air)
         Location checkLoc = new Location(arenaWorld,
                 ARENA1_CENTER_X,
-                ARENA1_CENTER_Y - 2,
+                ARENA1_MIN_Y,
                 ARENA1_CENTER_Z);
 
         // Nếu block không phải AIR → arena đã paste
@@ -134,7 +151,7 @@ public class ArenaManager {
 
                         Operation operation = new ClipboardHolder(clipboard)
                                 .createPaste(editSession)
-                                .to(BlockVector3.at(ARENA1_X, ARENA1_Y, ARENA1_Z))
+                                .to(BlockVector3.at(ARENA1_PASTE_X, ARENA1_PASTE_Y, ARENA1_PASTE_Z))
                                 .ignoreAirBlocks(false)
                                 .copyBiomes(false)
                                 .copyEntities(false)
@@ -143,7 +160,7 @@ public class ArenaManager {
                         Operations.complete(operation);
 
                         plugin.getLogger().info("✓ Arena1 created at ("
-                                + ARENA1_X + ", " + ARENA1_Y + ", " + ARENA1_Z + ")");
+                                + ARENA1_PASTE_X + ", " + ARENA1_PASTE_Y + ", " + ARENA1_PASTE_Z + ")");
 
                         if (callback != null) callback.run();
 
@@ -160,7 +177,7 @@ public class ArenaManager {
     }
 
     /**
-     * Get arena1 center location
+     * Get arena1 center location (for boss spawn)
      */
     public Location getArena1Center() {
         if (arenaWorld == null) return null;
@@ -172,9 +189,10 @@ public class ArenaManager {
 
     /**
      * Check if location is in arena1
+     * ✅ Uses measured bounds
      */
     public boolean isInArena(Location loc) {
-        if (loc.getWorld() == null || !loc.getWorld().equals(arenaWorld)) {
+        if (loc == null || loc.getWorld() == null || !loc.getWorld().equals(arenaWorld)) {
             return false;
         }
 
@@ -182,8 +200,8 @@ public class ArenaManager {
         int y = loc.getBlockY();
         int z = loc.getBlockZ();
 
-        return x >= ARENA1_X && x <= ARENA1_X + ARENA1_SIZE_X &&
-                y >= ARENA1_Y && y <= ARENA1_Y + ARENA1_SIZE_Y &&
-                z >= ARENA1_Z && z <= ARENA1_Z + ARENA1_SIZE_Z;
+        return x >= ARENA1_MIN_X && x <= ARENA1_MAX_X &&
+                y >= ARENA1_MIN_Y && y <= ARENA1_MAX_Y &&
+                z >= ARENA1_MIN_Z && z <= ARENA1_MAX_Z;
     }
 }
