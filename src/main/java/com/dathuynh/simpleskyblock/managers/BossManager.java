@@ -590,6 +590,12 @@ public class BossManager {
         }.runTaskTimer(plugin, 60L, 60L).getTaskId();
     }
 
+    public void addPlayerToBossBar(Player player) {
+        if (healthBossBar != null && bossData.isAlive()) {
+            healthBossBar.addPlayer(player);
+        }
+    }
+
     public BossConfig getBossConfig() {
         return bossConfig;
     }
