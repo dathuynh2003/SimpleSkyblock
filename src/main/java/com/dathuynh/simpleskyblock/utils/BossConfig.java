@@ -6,7 +6,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.*;
 
 public class BossConfig {
@@ -19,7 +18,6 @@ public class BossConfig {
         this.plugin = plugin;
         this.file = new File(plugin.getDataFolder(), "bosses.yml");
 
-        // Extract default if not exists
         if (!file.exists()) {
             plugin.saveResource("bosses.yml", false);
         }
@@ -31,12 +29,10 @@ public class BossConfig {
         config = YamlConfiguration.loadConfiguration(file);
     }
 
-    // Get boss section
     public ConfigurationSection getBoss(String bossId) {
         return config.getConfigurationSection("bosses." + bossId);
     }
 
-    // Helper methods
     public String getBossName(String bossId) {
         return config.getString("bosses." + bossId + ".name", "§cUnknown Boss");
     }
@@ -81,7 +77,7 @@ public class BossConfig {
             for (String key : section.getKeys(false)) {
                 PotionEffectType type = PotionEffectType.getByName(key);
                 if (type != null) {
-                    effects.put(type, section.getInt(key) - 1); // Level 2 → amplifier 1
+                    effects.put(type, section.getInt(key) - 1);
                 }
             }
         }
@@ -105,7 +101,6 @@ public class BossConfig {
         return config.getString("bosses." + bossId + ".announcements.respawn-notice", "§7Boss respawns soon!");
     }
 
-    // Rewards
     public int getRank1Min(String bossId) {
         return config.getInt("bosses." + bossId + ".rewards.rank-1.min", 3);
     }
@@ -138,7 +133,6 @@ public class BossConfig {
         return config.getString("bosses." + bossId + ".rewards.rank-other.item-id", "super_iron");
     }
 
-    // Enrage
     public boolean isEnrageEnabled(String bossId) {
         return config.getBoolean("bosses." + bossId + ".enrage.enabled", true);
     }
@@ -175,4 +169,19 @@ public class BossConfig {
         return config.getDouble("bosses." + bossId + ".ranged-attack.damage", 10);
     }
 
+    public Map<PotionEffectType, Integer> getEnrageEffects(String bossId) {
+        Map<PotionEffectType, Integer> effects = new HashMap<>();
+        ConfigurationSection section = config.getConfigurationSection("bosses." + bossId + ".enrage.effects");
+
+        if (section != null) {
+            for (String key : section.getKeys(false)) {
+                PotionEffectType type = PotionEffectType.getByName(key);
+                if (type != null) {
+                    effects.put(type, section.getInt(key) - 1);
+                }
+            }
+        }
+
+        return effects;
+    }
 }

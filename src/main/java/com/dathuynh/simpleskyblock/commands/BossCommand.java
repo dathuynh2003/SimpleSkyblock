@@ -21,6 +21,7 @@ public class BossCommand implements CommandExecutor {
             sender.sendMessage("§6⚔ §eBoss Commands:");
             sender.sendMessage("§7  /boss info §f- Xem thông tin boss");
             sender.sendMessage("§7  /boss spawn §f- Spawn boss (OP)");
+            sender.sendMessage("§7  /boss reload §f- Reload config (OP)");
             sender.sendMessage("§e═══════════════════════════════");
             return true;
         }
@@ -61,6 +62,13 @@ public class BossCommand implements CommandExecutor {
 
                 bossManager.spawnBoss();
                 sender.sendMessage("§a✓ Đã spawn boss!");
+                break;
+            case "reload":
+                if (!(sender instanceof Player) || !((Player) sender).isOp()) {
+                    sender.sendMessage("§cChỉ OP mới dùng được lệnh này!");
+                    return true;
+                }
+                bossManager.reloadConfig();
                 break;
 
             default:

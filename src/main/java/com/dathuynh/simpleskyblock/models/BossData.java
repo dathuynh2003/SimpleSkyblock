@@ -75,17 +75,17 @@ public class BossData {
         damageTracker.clear();
     }
 
-    public long getRespawnTimeLeft() {
+    public long getRespawnTimeLeft(int defaultRespawnTime) {
         if (isAlive) return 0;
 
         long elapsed = System.currentTimeMillis() - lastDeathTime;
-        long respawnTime = 30 * 60 * 1000; // 30 minutes
+        long respawnTime = defaultRespawnTime * 60 * 1000; // 30 minutes
         long remaining = respawnTime - elapsed;
 
         return Math.max(0, remaining);
     }
 
-    public boolean canRespawn() {
-        return !isAlive && getRespawnTimeLeft() == 0;
+    public boolean canRespawn(int defaultRespawnTime) {
+        return !isAlive && getRespawnTimeLeft(defaultRespawnTime) == 0;
     }
 }
