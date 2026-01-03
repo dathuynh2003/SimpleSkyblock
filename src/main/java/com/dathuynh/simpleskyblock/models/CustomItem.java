@@ -2,6 +2,7 @@ package com.dathuynh.simpleskyblock.models;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,9 +26,12 @@ public class CustomItem {
     private Double knockbackResistance;
     private Double movementSpeed;
 
+    private Map<PotionEffectType, Integer> potionEffects;
+
     public CustomItem(String id) {
         this.id = id;
         this.enchantments = new HashMap<>();
+        this.potionEffects = new HashMap<>();
     }
 
     // Builder pattern methods
@@ -141,5 +145,14 @@ public class CustomItem {
 
     public void setCustomModelData(int customModelData) {
         this.customModelData = customModelData;
+    }
+
+    public CustomItem addPotionEffect(PotionEffectType type, int amplifier) {
+        this.potionEffects.put(type, amplifier);
+        return this;
+    }
+
+    public Map<PotionEffectType, Integer> getPotionEffects() {
+        return potionEffects;
     }
 }

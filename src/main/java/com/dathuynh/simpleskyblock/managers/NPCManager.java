@@ -60,7 +60,7 @@ public class NPCManager implements Listener {
                 String type = npcData.getString("npcs." + uuidString + ".type");
                 npcTypes.put(uuid, type);
             }
-            plugin.getLogger().info("Đã load " + npcTypes.size() + " NPCs từ file");
+            plugin.getLogger().info("Loaded " + npcTypes.size() + " NPCs from file");
         }
     }
 
@@ -72,7 +72,7 @@ public class NPCManager implements Listener {
                     if (npcTypes.containsKey(villager.getUniqueId())) {
                         villager.setAI(false);
                         villager.setInvulnerable(true);
-                        plugin.getLogger().info("Đã restore NPC: " + villager.getCustomName());
+                        plugin.getLogger().info("Restored NPC: " + villager.getCustomName());
                     }
                 }
             }
@@ -88,7 +88,7 @@ public class NPCManager implements Listener {
         try {
             npcData.save(npcDataFile);
         } catch (IOException e) {
-            plugin.getLogger().severe("Không thể save NPC data: " + e.getMessage());
+            plugin.getLogger().severe("Cannot save NPC data: " + e.getMessage());
         }
     }
 
@@ -109,7 +109,7 @@ public class NPCManager implements Listener {
 
         npcTypes.put(npc.getUniqueId(), npcType);
         saveNPCData();
-        plugin.getLogger().info("NPC '" + npcType + "' đã được spawn tại " + location.toString());
+        plugin.getLogger().info("NPC '" + npcType + "' spawned at " + location.toString());
     }
 
     public void removeNPC(UUID uuid) {
@@ -151,7 +151,6 @@ public class NPCManager implements Listener {
 
         Inventory menu = Bukkit.createInventory(null, 54, npcData.getDisplayName());
 
-        // Decor - Fill với glass pane
         ItemStack glass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta glassMeta = glass.getItemMeta();
         glassMeta.setDisplayName(" ");
@@ -161,33 +160,35 @@ public class NPCManager implements Listener {
             menu.setItem(i, glass);
         }
 
-        // Đặt các trades vào menu
         for (TradeData trade : npcData.getTrades()) {
             int slot = trade.getGuiSlot();
 
-            // Hiển thị required items
             List<ItemStack> requirements = trade.getRequiredItems();
-            if (requirements.size() > 0) {
-                menu.setItem(slot - 4, createDisplayItem(requirements.get(0), "§7Cần:"));
+
+            int reqSlot1 = slot - 4;
+            int reqSlot2 = slot - 3;
+            int arrowSlot = slot - 2;
+
+            if (requirements.size() > 0 && reqSlot1 >= 0) {
+                menu.setItem(reqSlot1, createDisplayItem(requirements.get(0), "§7Required:"));
             }
-            if (requirements.size() > 1) {
-                menu.setItem(slot - 3, createDisplayItem(requirements.get(1), "§7+"));
+            if (requirements.size() > 1 && reqSlot2 >= 0) {
+                menu.setItem(reqSlot2, createDisplayItem(requirements.get(1), "§7+"));
             }
 
-            // Arrow
-            menu.setItem(slot - 2, createArrow());
+            if (arrowSlot >= 0) {
+                menu.setItem(arrowSlot, createArrow());
+            }
 
-            // Reward item
             menu.setItem(slot, trade.getRewardItem());
         }
 
-        // Info book
         ItemStack info = new ItemStack(Material.BOOK);
         ItemMeta infoMeta = info.getItemMeta();
-        infoMeta.setDisplayName("§e§lHướng dẫn");
+        infoMeta.setDisplayName("§e§lGuide");
         List<String> lore = new ArrayList<>();
-        lore.add("§7Click vào item muốn đổi");
-        lore.add("§7Cần có đủ vật phẩm yêu cầu");
+        lore.add("§7Click on item to trade");
+        lore.add("§7Need required items in inventory");
         lore.add("");
 
         for (TradeData trade : npcData.getTrades()) {

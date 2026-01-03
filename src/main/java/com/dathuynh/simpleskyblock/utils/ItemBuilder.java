@@ -108,13 +108,13 @@ public class ItemBuilder {
      *
      * @param armor Giáp (VD: 20 = full diamond)
      */
-    public ItemBuilder setArmor(double armor) {
+    public ItemBuilder setArmor(double armor, EquipmentSlot slot) {
         AttributeModifier modifier = new AttributeModifier(
                 UUID.randomUUID(),
                 "generic.armor",
                 armor,
                 AttributeModifier.Operation.ADD_NUMBER,
-                EquipmentSlot.CHEST // hoặc HEAD, LEGS, FEET
+                slot
         );
         meta.addAttributeModifier(Attribute.GENERIC_ARMOR, modifier);
         return this;
@@ -142,13 +142,13 @@ public class ItemBuilder {
      *
      * @param resistance 0.0 - 1.0 (1.0 = không bị văng)
      */
-    public ItemBuilder setKnockbackResistance(double resistance) {
+    public ItemBuilder setKnockbackResistance(double resistance, EquipmentSlot slot) {
         AttributeModifier modifier = new AttributeModifier(
                 UUID.randomUUID(),
                 "generic.knockbackResistance",
                 resistance,
                 AttributeModifier.Operation.ADD_NUMBER,
-                EquipmentSlot.CHEST
+                slot  // ← DÙNG PARAMETER!
         );
         meta.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, modifier);
         return this;
@@ -159,13 +159,13 @@ public class ItemBuilder {
      *
      * @param health Máu thêm (VD: 20 = +10 trái tim)
      */
-    public ItemBuilder setMaxHealth(double health) {
+    public ItemBuilder setMaxHealth(double health, EquipmentSlot slot) {
         AttributeModifier modifier = new AttributeModifier(
                 UUID.randomUUID(),
                 "generic.maxHealth",
                 health,
                 AttributeModifier.Operation.ADD_NUMBER,
-                EquipmentSlot.CHEST
+                slot  // ← DÙNG PARAMETER!
         );
         meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, modifier);
         return this;

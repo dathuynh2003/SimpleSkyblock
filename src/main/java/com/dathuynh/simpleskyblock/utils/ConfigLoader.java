@@ -10,7 +10,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Villager;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,14 +34,9 @@ public class ConfigLoader {
     }
 
     private void loadConfigs() {
-        // Tạo files mặc định nếu chưa có
         saveDefaultConfig("items.yml");
         saveDefaultConfig("npcs_config.yml");
-
-        // Load custom items trước
         loadCustomItems();
-
-        // Load NPCs
         loadNPCs();
     }
 
@@ -62,22 +59,18 @@ public class ConfigLoader {
             customItems.put(itemId, item);
         }
 
-        plugin.getLogger().info("Đã load " + customItems.size() + " custom items");
+        plugin.getLogger().info("Loaded " + customItems.size() + " custom items");
     }
 
     private CustomItem parseCustomItem(String id, ConfigurationSection section) {
         CustomItem item = new CustomItem(id);
 
-        // Basic properties
         item.setMaterial(Material.valueOf(section.getString("material", "DIAMOND_SWORD")));
         item.setDisplayName(section.getString("display-name", "§fCustom Item"));
         item.setLore(section.getStringList("lore"));
         item.setUnbreakable(section.getBoolean("unbreakable", false));
-
-        // ← THÊM CUSTOM MODEL DATA NGAY ĐÂY
         item.setCustomModelData(section.getInt("custom-model-data", 0));
 
-        // Enchantments
         ConfigurationSection enchants = section.getConfigurationSection("enchantments");
         if (enchants != null) {
             for (String enchantName : enchants.getKeys(false)) {
@@ -93,7 +86,6 @@ public class ConfigLoader {
             }
         }
 
-        // Custom attributes
         ConfigurationSection attributes = section.getConfigurationSection("attributes");
         if (attributes != null) {
             if (attributes.contains("damage")) {
@@ -116,6 +108,21 @@ public class ConfigLoader {
             }
         }
 
+        ConfigurationSection potionEffects = section.getConfigurationSection("potion-effects");
+        if (potionEffects != null) {
+            for (String effectName : potionEffects.getKeys(false)) {
+                try {
+                    PotionEffectType type = PotionEffectType.getByName(effectName.toUpperCase());
+                    int level = potionEffects.getInt(effectName);
+                    if (type != null) {
+                        item.addPotionEffect(type, level - 1);
+                    }
+                } catch (Exception e) {
+                    plugin.getLogger().warning("Invalid potion effect: " + effectName);
+                }
+            }
+        }
+
         return item;
     }
 
@@ -131,7 +138,7 @@ public class ConfigLoader {
             npcDataMap.put(npcId, npcData);
         }
 
-        plugin.getLogger().info("Đã load " + npcDataMap.size() + " NPC configs");
+        plugin.getLogger().info("Loaded " + npcDataMap.size() + " NPC configs");
     }
 
     private NPCData parseNPC(String id, ConfigurationSection section) {
@@ -139,7 +146,6 @@ public class ConfigLoader {
         Villager.Profession profession = Villager.Profession.valueOf(section.getString("profession", "TOOLSMITH"));
         int level = section.getInt("level", 5);
 
-        // Parse trades
         List<TradeData> trades = new ArrayList<>();
         ConfigurationSection tradesSection = section.getConfigurationSection("trades");
         if (tradesSection != null) {
@@ -155,7 +161,6 @@ public class ConfigLoader {
     private TradeData parseTrade(String id, ConfigurationSection section) {
         int guiSlot = section.getInt("gui-slot", 14);
 
-        // Parse required items
         List<ItemStack> requiredItems = new ArrayList<>();
         List<String> requirementsList = section.getStringList("requirements");
         for (String req : requirementsList) {
@@ -165,7 +170,6 @@ public class ConfigLoader {
             }
         }
 
-        // Parse reward item
         String rewardString = section.getString("reward");
         ItemStack rewardItem = parseItemString(rewardString);
 
@@ -173,17 +177,21 @@ public class ConfigLoader {
     }
 
     private ItemStack parseItemString(String itemString) {
-        // Format: "MATERIAL:amount" hoặc "custom:item_id"
         String[] parts = itemString.split(":");
 
         if (parts[0].equalsIgnoreCase("custom")) {
-            // Custom item
             CustomItem customItem = customItems.get(parts[1]);
             if (customItem != null) {
-                return buildItemFromCustom(customItem);
+                ItemStack item = buildItemFromCustom(customItem);
+
+                if (parts.length > 2) {
+                    int amount = Integer.parseInt(parts[2]);
+                    item.setAmount(amount);
+                }
+
+                return item;
             }
         } else {
-            // Vanilla item
             try {
                 Material material = Material.valueOf(parts[0].toUpperCase());
                 int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
@@ -196,19 +204,22 @@ public class ConfigLoader {
         return null;
     }
 
+    // ✅ FIX: Thêm slot parameter
     private ItemStack buildItemFromCustom(CustomItem customItem) {
-        ItemBuilder builder = new ItemBuilder(customItem.getMaterial()).setName(customItem.getDisplayName()).setUnbreakable(customItem.isUnbreakable());
+        ItemBuilder builder = new ItemBuilder(customItem.getMaterial())
+                .setName(customItem.getDisplayName())
+                .setUnbreakable(customItem.isUnbreakable());
 
         if (customItem.getLore() != null) {
             builder.setLore(customItem.getLore());
         }
 
-        // Enchantments
         for (Map.Entry<Enchantment, Integer> entry : customItem.getEnchantments().entrySet()) {
             builder.addEnchant(entry.getKey(), entry.getValue());
         }
 
-        // Attributes
+        EquipmentSlot slot = getEquipmentSlot(customItem.getMaterial());
+
         if (customItem.getDamage() != null) {
             builder.setDamage(customItem.getDamage());
         }
@@ -216,40 +227,64 @@ public class ConfigLoader {
             builder.setAttackSpeed(customItem.getAttackSpeed());
         }
         if (customItem.getArmor() != null) {
-            builder.setArmor(customItem.getArmor());
+            builder.setArmor(customItem.getArmor(), slot);
         }
         if (customItem.getMaxHealth() != null) {
-            builder.setMaxHealth(customItem.getMaxHealth());
+            builder.setMaxHealth(customItem.getMaxHealth(), slot);
         }
         if (customItem.getKnockbackResistance() != null) {
-            builder.setKnockbackResistance(customItem.getKnockbackResistance());
+            builder.setKnockbackResistance(customItem.getKnockbackResistance(), slot);
         }
         if (customItem.getMovementSpeed() != null) {
             builder.setMovementSpeed(customItem.getMovementSpeed());
         }
 
         if (customItem.getCustomModelData() > 0) {
-            plugin.getLogger().info("✅ ĐANG SET CustomModelData=" + customItem.getCustomModelData() + " cho " + customItem.getId());
             builder.setCustomModelData(customItem.getCustomModelData());
-        } else {
-            plugin.getLogger().warning("❌ CustomModelData = 0 cho " + customItem.getId());
         }
 
         builder.hideAllFlags();
 
-        ItemStack result = builder.build();
-
-        // KIỂM TRA SAU KHI BUILD
-        if (result.hasItemMeta() && result.getItemMeta().hasCustomModelData()) {
-            plugin.getLogger().info("✅✅ Item " + customItem.getId() + " ĐÃ CÓ CustomModelData=" + result.getItemMeta().getCustomModelData());
-        } else {
-            plugin.getLogger().warning("❌❌ Item " + customItem.getId() + " KHÔNG CÓ CustomModelData sau khi build!");
-        }
-
-        return result;
+        return builder.build();
     }
 
-    // Getters
+    // ✅ THÊM METHOD DETECT SLOT
+    private EquipmentSlot getEquipmentSlot(Material material) {
+        String name = material.name().toUpperCase();
+
+        if (name.contains("HELMET") || name.contains("HEAD") ||
+                name.equals("PLAYER_HEAD") || name.equals("CARVED_PUMPKIN") ||
+                name.equals("TURTLE_HELMET")) {
+            return EquipmentSlot.HEAD;
+        }
+
+        if (name.contains("CHESTPLATE") || name.contains("ELYTRA")) {
+            return EquipmentSlot.CHEST;
+        }
+
+        if (name.contains("LEGGINGS") || name.contains("PANTS")) {
+            return EquipmentSlot.LEGS;
+        }
+
+        if (name.contains("BOOTS") || name.contains("SHOES")) {
+            return EquipmentSlot.FEET;
+        }
+
+        if (name.equals("SHIELD") || name.equals("TOTEM_OF_UNDYING")) {
+            return EquipmentSlot.OFF_HAND;
+        }
+
+        if (name.contains("SWORD") || name.contains("AXE") ||
+                name.contains("PICKAXE") || name.contains("SHOVEL") ||
+                name.contains("HOE") || name.contains("BOW") ||
+                name.contains("CROSSBOW") || name.contains("TRIDENT") ||
+                name.contains("FISHING_ROD") || name.contains("SHEARS")) {
+            return EquipmentSlot.HAND;
+        }
+
+        return EquipmentSlot.OFF_HAND;
+    }
+
     public CustomItem getCustomItem(String id) {
         return customItems.get(id);
     }
@@ -260,5 +295,9 @@ public class ConfigLoader {
 
     public Map<String, NPCData> getAllNPCData() {
         return npcDataMap;
+    }
+
+    public Map<String, CustomItem> getAllCustomItems() {
+        return customItems;
     }
 }

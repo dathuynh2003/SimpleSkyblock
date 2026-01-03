@@ -52,7 +52,7 @@ public class Main extends JavaPlugin {
 
         getCommand("is").setExecutor(islandCommand);
         getCommand("spawn").setExecutor(new SpawnCommand(spawnManager));
-        getCommand("npc").setExecutor(new NPCCommand(npcManager));
+        getCommand("npc").setExecutor(new NPCCommand(this, npcManager, configLoader));
         getCommand("warp").setExecutor(new WarpCommand(miningZoneManager, spawnManager, arenaManager, netherZoneManager));
         getCommand("init").setExecutor(new InitCommand(spawnManager, miningZoneManager, arenaManager, netherZoneManager));
         getCommand("restart").setExecutor(new RestartCommand(this));
@@ -83,6 +83,7 @@ public class Main extends JavaPlugin {
         BossBarVisibilityListener bossBarListener = new BossBarVisibilityListener(bossManager, arenaManager);
         getServer().getPluginManager().registerEvents(bossBarListener, this);
         bossManager.setVisibilityListener(bossBarListener);
+        getServer().getPluginManager().registerEvents(new CustomItemEffectListener(this, configLoader), this);
 
         // Load kit data
         loadKitData();
@@ -232,6 +233,11 @@ public class Main extends JavaPlugin {
         } catch (java.io.IOException e) {
             getLogger().severe("Lỗi save kit data: " + e.getMessage());
         }
+    }
+
+    public void reloadConfigLoader() {
+        this.configLoader = new ConfigLoader(this);
+        getLogger().info("ConfigLoader reloaded!");
     }
 
     public BossManager getBossManager() {

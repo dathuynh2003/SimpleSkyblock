@@ -1,6 +1,9 @@
 package com.dathuynh.simpleskyblock.commands;
 
+import com.dathuynh.simpleskyblock.Main;
 import com.dathuynh.simpleskyblock.managers.NPCManager;
+import com.dathuynh.simpleskyblock.models.NPCData;
+import com.dathuynh.simpleskyblock.utils.ConfigLoader;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,44 +14,49 @@ import org.bukkit.util.RayTraceResult;
 
 public class NPCCommand implements CommandExecutor {
 
+    private Main plugin;
     private NPCManager npcManager;
+    private ConfigLoader configLoader;
 
-    public NPCCommand(NPCManager npcManager) {
+    public NPCCommand(Main plugin, NPCManager npcManager, ConfigLoader configLoader) {
+        this.plugin = plugin;
         this.npcManager = npcManager;
+        this.configLoader = configLoader;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("Chỉ người chơi mới dùng được lệnh này!");
+            sender.sendMessage("Only players can use this command!");
             return true;
         }
 
         Player player = (Player) sender;
 
         if (!player.isOp()) {
-            player.sendMessage("§cChỉ admin (OP) mới có thể quản lý NPC!");
+            player.sendMessage("§cOnly admins (OP) can manage NPCs!");
             return true;
         }
 
         if (args.length == 0) {
             player.sendMessage("§6=== NPC Commands ===");
             player.sendMessage("§e/npc spawn <type> §7- Spawn NPC");
-            player.sendMessage("§e/npc remove §7- Xóa NPC đang nhìn");
-            player.sendMessage("§e/npc list §7- Danh sách NPC types");
+            player.sendMessage("§e/npc remove §7- Remove targeted NPC");
+            player.sendMessage("§e/npc list §7- List all NPC types");
+            player.sendMessage("§e/npc reload §7- Reload configs");
             return true;
         }
 
         if (args[0].equalsIgnoreCase("spawn")) {
             if (args.length < 2) {
-                player.sendMessage("§cCần chỉ định loại NPC! Dùng: /npc spawn <type>");
-                player.sendMessage("§7Dùng /npc list để xem danh sách");
+                player.sendMessage("§cSpecify NPC type! Use: /npc spawn <type>");
+                player.sendMessage("§7Use /npc list to see available types");
                 return true;
             }
 
             String npcType = args[1].toLowerCase();
             npcManager.spawnNPC(player.getLocation(), npcType);
-            player.sendMessage("§aĐã spawn NPC type '" + npcType + "'!");
+            player.sendMessage("§aSpawned NPC type '" + npcType + "'!");
             return true;
         }
 
@@ -59,21 +67,38 @@ public class NPCCommand implements CommandExecutor {
                 Villager villager = (Villager) target;
                 npcManager.removeNPC(villager.getUniqueId());
                 villager.remove();
-                player.sendMessage("§aĐã xóa NPC!");
+                player.sendMessage("§aRemoved NPC!");
             } else {
-                player.sendMessage("§cHãy nhìn vào NPC muốn xóa (trong tầm 5 blocks)!");
+                player.sendMessage("§cLook at an NPC within 5 blocks!");
             }
             return true;
         }
 
         if (args[0].equalsIgnoreCase("list")) {
             player.sendMessage("§6=== Available NPC Types ===");
-            player.sendMessage("§eTất cả NPCs được config trong §fnpcs_config.yml");
+            player.sendMessage("§7All NPCs configured in §fnpcs_config.yml");
             player.sendMessage("");
-            player.sendMessage("§7Ví dụ:");
-            player.sendMessage("§e- thorentanthu §7- Thợ Rèn Tân Thủ");
-            player.sendMessage("§e- thorenvukhi §7- Thợ Rèn Vũ Khí");
-            player.sendMessage("§e- thieunang §7- Thiện Nàng");
+
+            for (String npcId : configLoader.getAllNPCData().keySet()) {
+                NPCData npcData = configLoader.getNPCData(npcId);
+                player.sendMessage("§e- " + npcId + " §7- " + npcData.getDisplayName());
+            }
+
+            player.sendMessage("");
+            player.sendMessage("§7Use: §e/npc spawn <type>");
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("reload")) {
+            player.sendMessage("§eReloading NPC configs...");
+
+            plugin.reloadConfigLoader();
+
+            player.sendMessage("§aSuccessfully reloaded:");
+            player.sendMessage("§7- items.yml");
+            player.sendMessage("§7- npcs_config.yml");
+            player.sendMessage("§7Total NPCs: §e" + configLoader.getAllNPCData().size());
+
             return true;
         }
 

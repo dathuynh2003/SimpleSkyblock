@@ -293,3 +293,40 @@ npcs:
           - "GRAVEL:128"
         reward: "CLAY_BALL:4"
 
+  stone_artisans:
+    display-name: "§8§lĐớ Thủ"
+    profession: MASON
+    level: 5
+
+    trades:
+      cobble_to_special:
+        gui-slot: 6
+        requirements:
+          - "COBBLESTONE:64"
+        reward: "custom:special_cobblestone"
+
+      special_to_pick1:
+        gui-slot: 15
+        requirements:
+          - "custom:special_cobblestone:64"
+        reward: "custom:pickaxe_noob_tier1"
+
+      special_to_pick2:
+        gui-slot: 24
+        requirements:
+          - "custom:special_cobblestone:64"
+          - "custom:pickaxe_noob_tier1"
+        reward: "custom:pickaxe_noob_tier2"
+
+      special_to_pick3:
+        gui-slot: 33
+        requirements:
+          - "custom:special_cobblestone:64"
+          - "custom:pickaxe_noob_tier2"
+        reward: "custom:pickaxe_noob_tier3"
+
+      special_to_armor:
+        gui-slot: 42
+        requirements:
+          - "custom:special_cobblestone:128"
+        reward: "custom:super_heavy_armor"

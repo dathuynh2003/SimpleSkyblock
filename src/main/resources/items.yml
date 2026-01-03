@@ -120,3 +120,88 @@ items:
     enchantments:
       LUCK: 1  # Glowing effect
     hide-enchants: true
+
+  special_cobblestone:
+    material: COBBLESTONE
+    display-name: "§6§lĐá Cuội Đặc Biệt"
+    lore:
+      - "§7Một cục đá đặc biệt hơn"
+      - "§7cục đá bình thường :))"
+      - ""
+      - "§7Có thể dùng để đổi đồ hiếm"
+      - ""
+      - "§e✦ §7Rarity: §aUncommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  super_heavy_armor:
+    material: CHAINMAIL_CHESTPLATE
+    display-name: "§8§lGiáp Siêu Nặng"
+    lore:
+      - "§7Bộ giáp với sức phòng thủ cao"
+      - "§7nhưng rất nặng."
+      - ""
+      - "§aVì rất nặng nên:"
+      - "§7Máu: §c+10 HP"
+      - "§7Giáp: §b+10"
+      - "§7Chống văng: §e100%"
+      - "§7Vì giáp quá nặng nên đi chậm 40%"
+      - ""
+      - "§e✦ §7Rarity: §5Epic"
+    unbreakable: true
+    enchantments:
+      PROTECTION_ENVIRONMENTAL: 5
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+    attributes:
+      armor: 10.0
+      max-health: 10.0
+      knockback-resistance: 1.0
+    potion-effects:
+      SLOW: 2  # Slowness II
+
+
+
+  # Cúp Của Đớ Thủ tiers
+  pickaxe_noob_tier1:
+    material: STONE_PICKAXE
+    display-name: "§b§lDụng Cụ Đập Đá I"
+    lore:
+      - "§7Đồ đập đá của người nghiện"
+      - "§7Đào nhanh I"
+      - ""
+      - "§eClick để đổi!"
+    unbreakable: true
+    enchantments:
+      DIG_SPEED: 1
+
+  pickaxe_noob_tier2:
+    material: IRON_PICKAXE
+    display-name: "§b§lDụng Cụ Đập Đá II"
+    lore:
+      - "§7Đồ đập đá của người nghiện II"
+      - "§7Đào nhanh hơn và hồi máu"
+      - ""
+      - "§eClick để đổi!"
+    unbreakable: true
+    enchantments:
+      DIG_SPEED: 2
+    potion-effects:
+      REGENERATION: 1
+
+  pickaxe_noob_tier3:
+    material: DIAMOND_PICKAXE
+    display-name: "§b§lCúp Của Đớ Thủ III"
+    lore:
+      - "§7..."
+      - "§7Đào siêu nhanh và hồi máu liên tục"
+      - ""
+      - "§eClick để đổi!"
+    unbreakable: true
+    enchantments:
+      DIG_SPEED: 3
+    potion-effects:
+      REGENERATION: 2
+
+

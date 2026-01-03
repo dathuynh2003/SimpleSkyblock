@@ -24,7 +24,6 @@ public class TradeMenuListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         String title = event.getView().getTitle();
 
-        // Check nếu là NPC menu
         NPCData npcData = findNPCByTitle(title);
         if (npcData == null) {
             return;
@@ -39,7 +38,6 @@ public class TradeMenuListener implements Listener {
         Player player = (Player) event.getWhoClicked();
         int slot = event.getSlot();
 
-        // Tìm trade tương ứng với slot
         for (TradeData trade : npcData.getTrades()) {
             if (trade.getGuiSlot() == slot) {
                 performTrade(player, trade);
@@ -60,24 +58,20 @@ public class TradeMenuListener implements Listener {
     private void performTrade(Player player, TradeData trade) {
         List<ItemStack> requirements = trade.getRequiredItems();
 
-        // Check xem player có đủ items không
         for (ItemStack required : requirements) {
             if (!hasItem(player, required)) {
                 String itemName = required.hasItemMeta() && required.getItemMeta().hasDisplayName()
                         ? required.getItemMeta().getDisplayName()
                         : required.getType().name();
                 player.sendMessage("§cBạn không đủ " + required.getAmount() + "x " + itemName + "!");
-                player.closeInventory();
                 return;
             }
         }
 
-        // Remove required items
         for (ItemStack required : requirements) {
             removeItem(player, required);
         }
 
-        // Give reward
         ItemStack reward = trade.getRewardItem().clone();
         player.getInventory().addItem(reward);
 
@@ -85,12 +79,10 @@ public class TradeMenuListener implements Listener {
                 ? reward.getItemMeta().getDisplayName()
                 : reward.getType().name();
 
-        player.sendMessage("§a§l✔ §aĐổi thành công! Bạn nhận được " + rewardName + "§a!");
-        player.closeInventory();
+        player.sendMessage("§aThành công! Bạn nhận được " + rewardName + "§a!");
     }
 
     private boolean hasItem(Player player, ItemStack required) {
-        // Nếu là custom item (có display name)
         if (required.hasItemMeta() && required.getItemMeta().hasDisplayName()) {
             String targetName = required.getItemMeta().getDisplayName();
             int count = 0;
@@ -107,11 +99,9 @@ public class TradeMenuListener implements Listener {
 
             return count >= required.getAmount();
         } else {
-            // Vanilla item
             int count = 0;
             for (ItemStack item : player.getInventory().getContents()) {
                 if (item != null && item.getType() == required.getType()) {
-                    // Chỉ đếm items không có custom name
                     if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
                         count += item.getAmount();
                     }
@@ -125,43 +115,42 @@ public class TradeMenuListener implements Listener {
         int remaining = required.getAmount();
 
         if (required.hasItemMeta() && required.getItemMeta().hasDisplayName()) {
-            // Custom item
             String targetName = required.getItemMeta().getDisplayName();
 
-            for (ItemStack item : player.getInventory().getContents()) {
+            for (int i = 0; i < player.getInventory().getSize(); i++) {
                 if (remaining <= 0) break;
 
-                if (item != null && item.getType() == required.getType()) {
-                    if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-                        if (item.getItemMeta().getDisplayName().equals(targetName)) {
-                            int itemAmount = item.getAmount();
-                            if (itemAmount <= remaining) {
-                                remaining -= itemAmount;
-                                player.getInventory().remove(item);
-                            } else {
-                                item.setAmount(itemAmount - remaining);
-                                remaining = 0;
-                            }
-                        }
-                    }
+                ItemStack item = player.getInventory().getItem(i);
+                if (item == null || item.getType() != required.getType()) continue;
+                if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) continue;
+                if (!item.getItemMeta().getDisplayName().equals(targetName)) continue;
+
+                int itemAmount = item.getAmount();
+
+                if (itemAmount <= remaining) {
+                    remaining -= itemAmount;
+                    player.getInventory().setItem(i, null);
+                } else {
+                    item.setAmount(itemAmount - remaining);
+                    remaining = 0;
                 }
             }
         } else {
-            // Vanilla item
-            for (ItemStack item : player.getInventory().getContents()) {
+            for (int i = 0; i < player.getInventory().getSize(); i++) {
                 if (remaining <= 0) break;
 
-                if (item != null && item.getType() == required.getType()) {
-                    if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
-                        int itemAmount = item.getAmount();
-                        if (itemAmount <= remaining) {
-                            remaining -= itemAmount;
-                            player.getInventory().remove(item);
-                        } else {
-                            item.setAmount(itemAmount - remaining);
-                            remaining = 0;
-                        }
-                    }
+                ItemStack item = player.getInventory().getItem(i);
+                if (item == null || item.getType() != required.getType()) continue;
+                if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) continue;
+
+                int itemAmount = item.getAmount();
+
+                if (itemAmount <= remaining) {
+                    remaining -= itemAmount;
+                    player.getInventory().setItem(i, null);
+                } else {
+                    item.setAmount(itemAmount - remaining);
+                    remaining = 0;
                 }
             }
         }

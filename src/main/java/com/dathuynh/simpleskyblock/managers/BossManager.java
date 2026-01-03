@@ -579,13 +579,27 @@ public class BossManager {
                         double damage = 15 * (1 - (distance / 5));
 
                         victim.damage(damage, boss);
-                        victim.setVelocity(victim.getLocation().subtract(bossLoc)
-                                .toVector().normalize().multiply(1.5).setY(0.5));
 
-                        victim.sendMessage("§c§l Boss Enrage Explosion!");
+                        // CHECK KNOCKBACK RESISTANCE
+                        double knockbackResist = getPlayerKnockbackResistance(victim);
+
+                        if (knockbackResist < 1.0) {
+                            double knockbackMultiplier = (1.0 - knockbackResist) * 1.5;
+
+                            org.bukkit.util.Vector knockback = victim.getLocation()
+                                    .subtract(bossLoc)
+                                    .toVector()
+                                    .normalize()
+                                    .multiply(knockbackMultiplier)
+                                    .setY(0.5 * (1.0 - knockbackResist));
+
+                            victim.setVelocity(knockback);
+                        }
+
                         victim.playSound(victim.getLocation(), Sound.ENTITY_PLAYER_HURT, 1.0f, 0.8f);
                     }
                 }
+
             }
         }.runTaskTimer(plugin, 60L, 60L).getTaskId();
     }
@@ -599,4 +613,35 @@ public class BossManager {
     public BossConfig getBossConfig() {
         return bossConfig;
     }
+
+    private double getPlayerKnockbackResistance(Player player) {
+        double total = 0.0;
+
+        ItemStack[] armor = player.getInventory().getArmorContents();
+        for (ItemStack item : armor) {
+            if (item != null && item.hasItemMeta()) {
+                total += getItemKnockbackResistance(item);
+            }
+        }
+
+        return Math.min(1.0, total);
+    }
+
+    private double getItemKnockbackResistance(ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return 0.0;
+
+        try {
+            var attributes = item.getItemMeta().getAttributeModifiers(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+            if (attributes == null || attributes.isEmpty()) return 0.0;
+
+            double total = 0.0;
+            for (var modifier : attributes) {
+                total += modifier.getAmount();
+            }
+            return total;
+        } catch (Exception e) {
+            return 0.0;
+        }
+    }
+
 }
