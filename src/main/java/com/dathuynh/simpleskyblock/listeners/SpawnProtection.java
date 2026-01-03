@@ -124,7 +124,17 @@ public class SpawnProtection implements Listener {
             if (!player.hasPotionEffect(PotionEffectType.SPEED)) {
                 player.addPotionEffect(new PotionEffect(
                         PotionEffectType.SPEED, 200, 1, false, false
-                )); // Tăng duration lên 200 ticks (10s)
+                ));
+            }
+        } else {
+            if (player.hasPotionEffect(PotionEffectType.SPEED)) {
+                PotionEffect currentSpeed = player.getPotionEffect(PotionEffectType.SPEED);
+                // Chỉ remove nếu là speed buff từ spawn (level 1, duration < 200)
+                if (currentSpeed != null &&
+                        currentSpeed.getAmplifier() == 1 &&
+                        currentSpeed.getDuration() <= 200) {
+                    player.removePotionEffect(PotionEffectType.SPEED);
+                }
             }
         }
     }

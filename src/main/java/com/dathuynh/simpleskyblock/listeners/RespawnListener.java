@@ -24,15 +24,11 @@ public class RespawnListener implements Listener {
         Player player = event.getPlayer();
         Island island = islandManager.getIsland(player.getUniqueId());
 
-        //Nếu có island → luôn respawn tại island (bất kể chết ở đâu)
+        event.setRespawnLocation(spawnManager.getSpawnLocation());
+        player.sendMessage("§7Bạn đã hồi sinh tại §bLobby§7!");
         if (island != null && island.getLocation() != null) {
-            event.setRespawnLocation(island.getLocation());
-            player.sendMessage("§aĐã hồi sinh tại đảo của bạn!");
-        }
-        //Nếu không có island → respawn tại lobby
-        else {
-            event.setRespawnLocation(spawnManager.getSpawnLocation());
-            player.sendMessage("§eĐã hồi sinh tại Lobby!");
+            player.sendMessage("§7Sử dụng §e/is home §7để về đảo!");
+        } else {
             player.sendMessage("§7Sử dụng §e/is create §7để tạo đảo riêng!");
         }
     }
