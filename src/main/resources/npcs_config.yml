@@ -409,3 +409,156 @@ npcs:
           - "NETHERITE_INGOT:64"
         reward: "custom:farming_hoe_tier3"
 
+  stone_trader:
+    display-name: "§7§lThợ Đá"
+    profession: MASON
+    level: 5
+
+    trades:
+      cobble_to_sand:
+        gui-slot: 6
+        requirements:
+          - "COBBLESTONE:8"
+        reward: "SAND:1"
+
+      cobble_to_soul_sand:
+        gui-slot: 15
+        requirements:
+          - "COBBLESTONE:16"
+        reward: "SOUL_SAND:1"
+
+      cobble_to_dirt:
+        gui-slot: 24
+        requirements:
+          - "COBBLESTONE:8"
+        reward: "DIRT:1"
+
+      cobble_to_coarse_dirt:
+        gui-slot: 33
+        requirements:
+          - "COBBLESTONE:24"
+        reward: "COARSE_DIRT:1"
+
+  wood_trader:
+    display-name: "§2§lThương Nhân Cây"
+    profession: FARMER
+    level: 5
+
+    trades:
+      wood_to_oak_sapling:
+        gui-slot: 6
+        requirements:
+          - "OAK_LOG:32"
+        reward: "OAK_SAPLING:1"
+
+      wood_to_birch_sapling:
+        gui-slot: 15
+        requirements:
+          - "OAK_LOG:32"
+        reward: "BIRCH_SAPLING:1"
+
+      wood_to_spruce_sapling:
+        gui-slot: 24
+        requirements:
+          - "BIRCH_LOG:32"
+        reward: "SPRUCE_SAPLING:1"
+
+      wood_to_jungle_sapling:
+        gui-slot: 33
+        requirements:
+          - "SPRUCE_LOG:32"
+        reward: "JUNGLE_SAPLING:1"
+
+      wood_to_acacia_sapling:
+        gui-slot: 42
+        requirements:
+          - "JUNGLE_LOG:32"
+        reward: "ACACIA_SAPLING:1"
+
+      wood_to_dark_oak_sapling:
+        gui-slot: 51
+        requirements:
+          - "ACACIA_LOG:32"
+        reward: "DARK_OAK_SAPLING:1"
+
+  emerald_trader:
+    display-name: "§a§lThương Nhân Ngọc Lục Bảo"
+    profession: CLERIC
+    level: 5
+
+    trades:
+      emerald_to_pumpkin_seeds:
+        gui-slot: 6
+        requirements:
+          - "EMERALD:2"
+        reward: "PUMPKIN_SEEDS:8"
+
+      emerald_to_melon_seeds:
+        gui-slot: 15
+        requirements:
+          - "EMERALD:2"
+        reward: "MELON_SEEDS:8"
+
+      emerald_to_nether_wart:
+        gui-slot: 24
+        requirements:
+          - "EMERALD:4"
+        reward: "NETHER_WART:4"
+
+      emerald_to_beetroot:
+        gui-slot: 33
+        requirements:
+          - "EMERALD:1"
+        reward: "BEETROOT:4"
+
+      emerald_combo_trade:
+        gui-slot: 42
+        requirements:
+          - "EMERALD:8"
+        reward: "PUMPKIN_SEEDS:4"
+
+  hunter1:
+    display-name: "§f§lThợ Săn I"
+    profession: LEATHERWORKER
+    level: 5
+
+    trades:
+      # Trade lông vũ thường -> Lông vũ siêu nhẹ
+      feather_to_super_feather:
+        gui-slot: 6
+        requirements:
+          - "FEATHER:64"
+        reward: "custom:super_light_feather"
+
+      # Trade xương thường -> Xương siêu nhẹ
+      bone_to_super_bone:
+        gui-slot: 15
+        requirements:
+          - "BONE:64"
+        reward: "custom:super_light_bone"
+
+      # Trade nguyên liệu -> Giày siêu tốc
+      materials_to_boots:
+        gui-slot: 24
+        requirements:
+          - "custom:super_light_feather:1"
+          - "custom:super_light_bone:1"
+        reward: "custom:super_speed_boots"
+
+      # Trade nâng cấp: đổi boots cũ + thêm nguyên liệu
+      upgrade_boots:
+        gui-slot: 33
+        requirements:
+          - "custom:super_speed_boots:1"
+          - "custom:super_light_feather:1"
+          - "custom:super_light_bone:1"
+          - "DIAMOND:8"
+        reward: "custom:super_speed_boots_tier2"
+
+      # Trade nâng cấp: đổi boots cũ + thêm nguyên liệu
+      materials_to_helmet:
+        gui-slot: 42
+        requirements:
+          - "custom:super_light_feather:1"
+          - "custom:super_light_bone:1"
+        reward: "custom:super_light_helmet"

@@ -11,6 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -85,6 +86,10 @@ public class ConfigLoader {
                 }
             }
         }
+
+        // ===== THÊM XỬ LÝ HIDE-ENCHANTS =====
+        item.setHideEnchants(section.getBoolean("hide-enchants", false));
+        // ===== END =====
 
         ConfigurationSection attributes = section.getConfigurationSection("attributes");
         if (attributes != null) {
@@ -204,7 +209,6 @@ public class ConfigLoader {
         return null;
     }
 
-    // ✅ FIX: Thêm slot parameter
     private ItemStack buildItemFromCustom(CustomItem customItem) {
         ItemBuilder builder = new ItemBuilder(customItem.getMaterial())
                 .setName(customItem.getDisplayName())
@@ -217,6 +221,13 @@ public class ConfigLoader {
         for (Map.Entry<Enchantment, Integer> entry : customItem.getEnchantments().entrySet()) {
             builder.addEnchant(entry.getKey(), entry.getValue());
         }
+
+        // ===== XỬ LÝ HIDE-ENCHANTS =====
+        if (customItem.isHideEnchants()) {
+            // Chỉ ẩn enchants
+            builder.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+        // ===== END =====
 
         EquipmentSlot slot = getEquipmentSlot(customItem.getMaterial());
 
@@ -243,12 +254,9 @@ public class ConfigLoader {
             builder.setCustomModelData(customItem.getCustomModelData());
         }
 
-        builder.hideAllFlags();
-
         return builder.build();
     }
 
-    // ✅ THÊM METHOD DETECT SLOT
     private EquipmentSlot getEquipmentSlot(Material material) {
         String name = material.name().toUpperCase();
 

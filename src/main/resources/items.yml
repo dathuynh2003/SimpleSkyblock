@@ -402,6 +402,137 @@ items:
       LOOT_BONUS_BLOCKS: 5
     hide-enchants: false
 
+  #Thợ Săn I
+  super_light_feather:
+    material: FEATHER
+    display-name: "§f§lLông Vũ Siêu Nhẹ"
+    lore:
+      - "§7Lông vũ đặc biệt nhẹ được"
+      - "§7chọn ra từ hàng nghìn lông vũ."
+      - ""
+      - "§7Có thể dùng để chế tạo"
+      - "§7đồ đặc biệt siêu nhẹ"
+      - ""
+      - "§e✦ §7Rarity: §aUncommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  super_light_bone:
+    material: BONE
+    display-name: "§f§lXương Siêu Nhẹ"
+    lore:
+      - "§7Xương đặc biệt nhẹ được"
+      - "§7chọn ra từ hàng nghìn xương."
+      - ""
+      - "§7Vẫn giữ được độ cứng nhưng"
+      - "§7lại nhẹ không tưởng"
+      - ""
+      - "§e✦ §7Rarity: §aUncommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  super_speed_boots:
+    material: LEATHER_BOOTS
+    display-name: "§e§lGiày Siêu Tốc"
+    lore:
+      - "§7Giày được chế tạo từ lông vũ"
+      - "§7siêu nhẹ và xương siêu nhẹ."
+      - ""
+      - "§7Giữ được độ chắc chắn nhưng"
+      - "§7lại rất nhẹ giúp người dùng"
+      - "§7di chuyển nhanh hơn."
+      - ""
+      - "§a§7Tốc độ: §e+50%"
+#      - "§a§7Độ bền: §e∞ Vô Hạn"
+      - ""
+      - "§e✦ §7Rarity: §bRare"
+#    unbreakable: true
+    enchantments:
+#      PROTECTION_ENVIRONMENTAL: 3
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+    attributes:
+      movement-speed: 0.05  # +50% tốc độ (base là 0.1)
+      armor: 2.0
+      max-health: 1.0
+
+  super_speed_boots_tier2:
+    material: CHAINMAIL_BOOTS
+    display-name: "§6§lGiày Thần Tốc"
+    lore:
+      - "§7Phiên bản nâng cấp của"
+      - "§7Giày Siêu Tốc."
+      - ""
+      - "§7Được gia cố bằng kim cương"
+      - "§7mang lại tốc độ kinh ngạc!"
+      - ""
+      - "§a▸ §7Tốc độ: §e+80%"
+      - "§a▸ §7Giáp: §b+3"
+      - "§a▸ §7Độ bền: §e∞ Vô Hạn"
+      - "§a▸ §7Giảm sát thương khi rơi"
+      - ""
+      - "§6§lĐừng chạy quá nhanh!"
+      - ""
+      - "§e✦ §7Rarity: §5Epic"
+    unbreakable: true
+    enchantments:
+      PROTECTION_FALL: 4
+      LUCK: 1
+    hide-enchants: true
+    attributes:
+      movement-speed: 0.08  # +80% tốc độ
+      armor: 3.0
+      max-health: 3.0
+
+  super_light_helmet:
+    material: LEATHER_HELMET
+    display-name: "§f§lMũ Siêu Nhẹ"
+    lore:
+      - "§7Mũ được dệt từ lông vũ siêu nhẹ"
+      - "§7và gia cố bằng xương siêu nhẹ."
+      - ""
+      - "§7Nhẹ như không khí nhưng vẫn"
+      - "§7bảo vệ đầu hiệu quả."
+      - ""
+      - "§a▸ §7Giáp: §b+2"
+      - "§a▸ §7Tốc độ: §e+10%"
+      - "§a▸ §7Độ bền: §e∞ Vô Hạn"
+      - ""
+      - "§e✦ §7Rarity: §bRare"
+    unbreakable: true
+    enchantments:
+      PROTECTION_ENVIRONMENTAL: 2
+      LUCK: 1
+    hide-enchants: true
+    attributes:
+      armor: 2.0
+      movement-speed: 0.01
+
+  # Áo giáp siêu nhẹ
+  super_light_chestplate:
+    material: LEATHER_CHESTPLATE
+    display-name: "§f§lÁo Giáp Siêu Nhẹ"
+    lore:
+      - "§7Áo giáp được dệt từ lông vũ"
+      - "§7siêu nhẹ và xương siêu nhẹ."
+      - ""
+      - "§7Bảo vệ tốt mà không gây"
+      - "§7cảm giác nặng nề."
+      - ""
+      - "§a▸ §7Giáp: §b+4"
+      - "§a▸ §7Tốc độ: §e+15%"
+      - "§a▸ §7Độ bền: §e∞ Vô Hạn"
+      - ""
+      - "§e✦ §7Rarity: §bRare"
+    unbreakable: true
+    enchantments:
+      LUCK: 1
+    hide-enchants: true
+    attributes:
+      armor: 4.0
+      movement-speed: 0.015
 
 
 

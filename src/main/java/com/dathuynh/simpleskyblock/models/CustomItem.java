@@ -25,6 +25,7 @@ public class CustomItem {
     private Double maxHealth;
     private Double knockbackResistance;
     private Double movementSpeed;
+    private boolean hideEnchants = false;
 
     private Map<PotionEffectType, Integer> potionEffects;
 
@@ -154,5 +155,13 @@ public class CustomItem {
 
     public Map<PotionEffectType, Integer> getPotionEffects() {
         return potionEffects;
+    }
+
+    public boolean isHideEnchants() {
+        return hideEnchants;
+    }
+
+    public void setHideEnchants(boolean hideEnchants) {
+        this.hideEnchants = hideEnchants;
     }
 }
