@@ -125,13 +125,13 @@ public class ItemBuilder {
      *
      * @param speed Tốc độ (0.1 = +10%, 1.0 = +100%)
      */
-    public ItemBuilder setMovementSpeed(double speed) {
+    public ItemBuilder setMovementSpeed(double speed, EquipmentSlot slot) {
         AttributeModifier modifier = new AttributeModifier(
                 UUID.randomUUID(),
                 "generic.movementSpeed",
                 speed,
                 AttributeModifier.Operation.ADD_SCALAR, // Nhân phần trăm
-                EquipmentSlot.FEET
+                slot
         );
         meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, modifier);
         return this;
@@ -165,7 +165,7 @@ public class ItemBuilder {
                 "generic.maxHealth",
                 health,
                 AttributeModifier.Operation.ADD_NUMBER,
-                slot  // ← DÙNG PARAMETER!
+                slot
         );
         meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, modifier);
         return this;

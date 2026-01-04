@@ -236,7 +236,7 @@ public class ConfigLoader {
             builder.setKnockbackResistance(customItem.getKnockbackResistance(), slot);
         }
         if (customItem.getMovementSpeed() != null) {
-            builder.setMovementSpeed(customItem.getMovementSpeed());
+            builder.setMovementSpeed(customItem.getMovementSpeed(), slot);
         }
 
         if (customItem.getCustomModelData() > 0) {

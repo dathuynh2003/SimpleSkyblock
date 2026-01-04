@@ -70,7 +70,7 @@ public class ItemManager {
             builder.setKnockbackResistance(customItem.getKnockbackResistance(), slot);
         }
         if (customItem.getMovementSpeed() != null) {
-            builder.setMovementSpeed(customItem.getMovementSpeed());
+            builder.setMovementSpeed(customItem.getMovementSpeed(), slot);
         }
 
         builder.hideAllFlags();
