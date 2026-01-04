@@ -162,19 +162,27 @@ public class NPCManager implements Listener {
 
         for (TradeData trade : npcData.getTrades()) {
             int slot = trade.getGuiSlot();
-
             List<ItemStack> requirements = trade.getRequiredItems();
 
-            int reqSlot1 = slot - 4;
-            int reqSlot2 = slot - 3;
+            // ===== FIX: Hiển thị TẤT CẢ requirements =====
+            // Layout: [req1] [req2] [req3] [req4] [arrow] [reward]
+            int[] reqSlots = {slot - 6, slot - 5, slot - 4, slot - 3}; // Có thể chứa tối đa 4 requirements
             int arrowSlot = slot - 2;
 
-            if (requirements.size() > 0 && reqSlot1 >= 0) {
-                menu.setItem(reqSlot1, createDisplayItem(requirements.get(0), "§7Required:"));
+            // Hiển thị từng requirement
+            for (int i = 0; i < requirements.size() && i < reqSlots.length; i++) {
+                if (reqSlots[i] >= 0) {
+                    String prefix = (i == 0) ? "§7Required:" : "§7+";
+                    menu.setItem(reqSlots[i], createDisplayItem(requirements.get(i), prefix));
+                }
             }
-            if (requirements.size() > 1 && reqSlot2 >= 0) {
-                menu.setItem(reqSlot2, createDisplayItem(requirements.get(1), "§7+"));
+
+            // Nếu có quá 4 requirements, hiển thị thông báo
+            if (requirements.size() > 4) {
+                plugin.getLogger().warning("Trade '" + trade.getId() + "' có " + requirements.size()
+                        + " requirements, chỉ hiển thị được 4 items đầu tiên!");
             }
+            // ===== END FIX =====
 
             if (arrowSlot >= 0) {
                 menu.setItem(arrowSlot, createArrow());

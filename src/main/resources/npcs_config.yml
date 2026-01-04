@@ -20,20 +20,20 @@ npcs:
     level: 5
     trades:
       trade1:
-        gui-slot: 14
+        gui-slot: 15
         requirements:
           - "COBBLESTONE:128"
         reward: "custom:pickaxe_tier1"
 
       trade2:
-        gui-slot: 23
+        gui-slot: 24
         requirements:
           - "custom:pickaxe_tier1"
           - "COBBLESTONE:320"
         reward: "custom:pickaxe_tier2"
 
       trade3:
-        gui-slot: 32
+        gui-slot: 33
         requirements:
           - "custom:pickaxe_tier2"
           - "COBBLESTONE:640"
@@ -45,19 +45,19 @@ npcs:
     level: 5
     trades:
       sword:
-        gui-slot: 14
+        gui-slot: 15
         requirements:
           - "DIAMOND:64"
         reward: "custom:god_sword"
 
       pickaxe:
-        gui-slot: 23
+        gui-slot: 24
         requirements:
           - "EMERALD:64"
         reward: "custom:god_pickaxe"
 
       armor:
-        gui-slot: 32
+        gui-slot: 33
         requirements:
           - "NETHERITE_INGOT:64"
         reward: "custom:god_chestplate"
@@ -69,7 +69,7 @@ npcs:
     level: 5
     trades:
       heal_potion:
-        gui-slot: 14
+        gui-slot: 15
         requirements:
           - "GOLD_INGOT:16"
         reward: "POTION:1" # Có thể custom thêm
@@ -81,13 +81,13 @@ npcs:
 
     trades:
       wheat_to_birch:
-        gui-slot: 20
+        gui-slot: 6
         requirements:
           - "WHEAT:64"
         reward: "BIRCH_SAPLING:1"
 
       potato_to_spruce:
-        gui-slot: 22
+        gui-slot: 15
         requirements:
           - "POTATO:128"
         reward: "SPRUCE_SAPLING:1"
@@ -99,7 +99,7 @@ npcs:
         reward: "APPLE:1"
 
       melon_to_beetroot:
-        gui-slot: 31
+        gui-slot: 33
         requirements:
           - "MELON_SLICE:512"
         reward: "BEETROOT:3"
@@ -111,13 +111,13 @@ npcs:
 
     trades:
       cobble_to_sand:
-        gui-slot: 20
+        gui-slot: 6
         requirements:
           - "COBBLESTONE:256"
         reward: "SAND:4"
 
       cobble_to_gravel:
-        gui-slot: 22
+        gui-slot: 15
         requirements:
           - "COBBLESTONE:512"
         reward: "GRAVEL:8"
@@ -129,7 +129,7 @@ npcs:
         reward: "STONE:16"
 
       cobble_to_calcite:
-        gui-slot: 31
+        gui-slot: 33
         requirements:
           - "COBBLESTONE:2048"
         reward: "CALCITE:1"
@@ -141,13 +141,13 @@ npcs:
 
     trades:
       flesh_to_chicken:
-        gui-slot: 20
+        gui-slot: 6
         requirements:
           - "ROTTEN_FLESH:384"
         reward: "CHICKEN_SPAWN_EGG:1"
 
       bone_to_sheep:
-        gui-slot: 22
+        gui-slot: 15
         requirements:
           - BONE:192
         reward: "SHEEP_SPAWN_EGG:1"
@@ -160,7 +160,7 @@ npcs:
         reward: "COW_SPAWN_EGG:1"
 
       string_to_cat:
-        gui-slot: 31
+        gui-slot: 33
         requirements:
           - "STRING:768"
         reward: "CAT_SPAWN_EGG:1"
@@ -172,13 +172,13 @@ npcs:
 
     trades:
       coal_to_glowstone:
-        gui-slot: 20
+        gui-slot: 6
         requirements:
           - "COAL:64"
         reward: "GLOWSTONE_DUST:4"
 
       blaze_to_wart:
-        gui-slot: 22
+        gui-slot: 15
         requirements:
           - "BLAZE_ROD:32"
         reward: "NETHER_WART:8"
@@ -190,40 +190,10 @@ npcs:
         reward: "SOUL_SAND:16"
 
       netherrack_to_brick:
-        gui-slot: 31
+        gui-slot: 33
         requirements:
           - "NETHERRACK:128"
         reward: "NETHER_BRICK:4"
-
-  #  forest_keeper:
-  #    display-name: "§2§lTHỢ GỖ LÃO THÀNH"
-  #    profession: "LUMBERJACK"
-  #    level: 5
-  #
-  #    trades:
-  #      oak_to_jungle:
-  #        gui-slot: 20
-  #        requirements:
-  #          - "OAK_LOG:512"
-  #        reward: "JUNGLE_SAPLING:1"
-  #
-  #      birch_to_acacia:
-  #        gui-slot: 22
-  #        requirements:
-  #          - "BIRCH_LOG:256"
-  #        reward: "ACACIA_SAPLING:1"
-  #
-  #      spruce_to_bark:
-  #        gui-slot: 24
-  #        requirements:
-  #          - "SPRUCE_LOG:128"
-  #        reward: "STRIPPED_SPRUCE_LOG:4"
-  #
-  #      wood_to_bamboo:
-  #        gui-slot: 31
-  #        requirements:
-  #          - "OAK_LOG:64"
-  #        reward: "BAMBOO:4"
 
   wandering_merchant:
     display-name: "§e§lTHƯƠNG GIA LANG THANG"
@@ -232,14 +202,14 @@ npcs:
 
     trades:
       end_items:
-        gui-slot: 20
+        gui-slot: 6
         requirements:
           - "ENDER_PEARL:128"
           - "BLAZE_POWDER:64"
         reward: "ENDER_EYE:8"
 
       crops_to_villager:
-        gui-slot: 22
+        gui-slot: 15
         requirements:
           - "WHEAT:256"
           - "CARROT:128"
@@ -254,7 +224,7 @@ npcs:
         reward: "REDSTONE:16"
 
       mob_to_lapis:
-        gui-slot: 31
+        gui-slot: 33
         requirements:
           - "ROTTEN_FLESH:512"
           - "STRING:256"
@@ -267,13 +237,13 @@ npcs:
 
     trades:
       sand_to_ice:
-        gui-slot: 20
+        gui-slot: 6
         requirements:
           - "SAND:128"
         reward: "ICE:1"
 
       string_to_rod:
-        gui-slot: 22
+        gui-slot: 15
         requirements:
           - "STRING:64"
           - "STICK:32"
@@ -287,7 +257,7 @@ npcs:
         reward: "KELP:8"
 
       sand_gravel_to_clay:
-        gui-slot: 31
+        gui-slot: 33
         requirements:
           - "SAND:256"
           - "GRAVEL:128"
@@ -330,3 +300,112 @@ npcs:
         requirements:
           - "custom:special_cobblestone:128"
         reward: "custom:super_heavy_armor"
+
+  thannong:
+    display-name: "§a§lThần Nông"
+    profession: FARMER
+    level: 5
+
+    trades:
+      cactus_trade:
+        gui-slot: 6
+        requirements:
+          - "CACTUS:64"
+        reward: "custom:cactus_essence"
+
+      sugar_trade:
+        gui-slot: 15
+        requirements:
+          - "SUGAR_CANE:128"
+        reward: "custom:refined_sugar"
+
+      potato_trade:
+        gui-slot: 24
+        requirements:
+          - "POTATO:128"
+        reward: "custom:potato_starch"
+
+      wheat_trade:
+        gui-slot: 33
+        requirements:
+          - "WHEAT:64"
+        reward: "custom:wheat_oil"
+
+      beetroot_trade:
+        gui-slot: 42
+        requirements:
+          - "BEETROOT:64"
+        reward: "custom:concentrated_beetroot"
+
+  thannong2:
+    display-name: "§2§lThần Nông II"
+    profession: FARMER
+    level: 5
+
+    trades:
+      carrot_trade:
+        gui-slot: 6
+        requirements:
+          - "CARROT:128"
+        reward: "custom:carrot_essence"
+
+      golden_potato_trade:
+        gui-slot: 15
+        requirements:
+          - "POTATO:64"
+          - "GOLD_INGOT:4"
+        reward: "custom:golden_potato"
+
+      melon_trade:
+        gui-slot: 24
+        requirements:
+          - "MELON:32"
+        reward: "custom:melon_concentrate"
+
+      pumpkin_trade:
+        gui-slot: 33
+        requirements:
+          - "PUMPKIN:64"
+        reward: "custom:pumpkin_seed_oil"
+
+      nether_wart_trade:
+        gui-slot: 42
+        requirements:
+          - "NETHER_WART:64"
+        reward: "custom:nether_wart_extract"
+
+  thorennongcu:
+    display-name: "§e§lThợ Rèn Nông Cụ"
+    profession: TOOLSMITH
+    level: 5
+
+    trades:
+      hoe_tier1:
+        gui-slot: 15
+        requirements:
+          - "custom:cactus_essence:16"
+          - "custom:refined_sugar:16"
+          - "custom:potato_starch:16"
+          - "custom:wheat_oil:8"
+          - "custom:concentrated_beetroot:8"
+        reward: "custom:farming_hoe_tier1"
+
+      hoe_tier2:
+        gui-slot: 24
+        requirements:
+          - "custom:farming_hoe_tier1:1"
+          - "custom:carrot_essence:16"
+          - "custom:melon_concentrate:16"
+          - "custom:pumpkin_seed_oil:16"
+          - "NETHERITE_INGOT:2"
+        reward: "custom:farming_hoe_tier2"
+
+      hoe_tier3:
+        gui-slot: 33
+        requirements:
+          - "custom:farming_hoe_tier2:1"
+          - "custom:golden_potato:8"
+          - "custom:nether_wart_extract:16"
+          - "NETHERITE_INGOT:64"
+        reward: "custom:farming_hoe_tier3"
+

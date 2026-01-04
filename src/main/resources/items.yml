@@ -161,8 +161,6 @@ items:
     potion-effects:
       SLOW: 2  # Slowness II
 
-
-
   # Cúp Của Đớ Thủ tiers
   pickaxe_noob_tier1:
     material: STONE_PICKAXE
@@ -203,5 +201,209 @@ items:
       DIG_SPEED: 3
     potion-effects:
       REGENERATION: 2
+
+  # Thần Nông NPC
+  cactus_essence:
+    material: GREEN_DYE
+    display-name: "§a§lTinh Chất Xương Rồng"
+    lore:
+      - "§7Tinh chất được chiết xuất từ"
+      - "§7những bụi cây xương rồng."
+      - ""
+      - "§7Có thể dùng để đổi đồ đặc biệt"
+      - ""
+      - "§e✦ §7Rarity: §aUncommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  refined_sugar:
+    material: SUGAR
+    display-name: "§f§lĐường Tinh Luyện"
+    lore:
+      - "§7Loại đường trắng được tinh chế kỹ"
+      - "§7thường dùng trong các món tráng miệng."
+      - ""
+      - "§7Có thể dùng để đổi vật phẩm đặc biệt"
+      - ""
+      - "§e✦ §7Rarity: §fCommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  potato_starch:
+    material: WHITE_DYE
+    display-name: "§f§lTinh Bột Khoai Tây"
+    lore:
+      - "§7Bột tinh chất được chiết xuất từ"
+      - "§7khoai tây tươi ngon."
+      - ""
+      - "§7Có thể dùng để đổi vật phẩm đặc biệt"
+      - ""
+      - "§e✦ §7Rarity: §fCommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  wheat_oil:
+    material: HONEY_BOTTLE
+    display-name: "§6§lTinh Dầu Lúa Mì"
+    lore:
+      - "§7Dầu vàng óng được ép từ"
+      - "§7hạt lúa mì chất lượng cao."
+      - ""
+      - "§7Có thể dùng để đổi đồ hiếm"
+      - ""
+      - "§e✦ §7Rarity: §aUncommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  concentrated_beetroot:
+    material: RED_DYE
+    display-name: "§c§lCủ Dền Cô Đặc"
+    lore:
+      - "§7Những hạt màu đỏ thẫm được"
+      - "§7chiết xuất từ củ dền."
+      - ""
+      - "§7Có thể dùng để đổi đồ đặc biệt"
+      - ""
+      - "§e✦ §7Rarity: §aUncommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  # Thần Nông II NPC
+  carrot_essence:
+    material: ORANGE_DYE
+    display-name: "§6§lTinh Chất Cà Rốt"
+    lore:
+      - "§7Tinh chất màu cam rực rỡ được"
+      - "§7chiết xuất từ cà rốt tươi ngon."
+      - ""
+      - "§7Có thể dùng để đổi đồ đặc biệt"
+      - ""
+      - "§e✦ §7Rarity: §aUncommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  golden_potato:
+    material: GOLD_NUGGET
+    display-name: "§e§lKhoai Tây Vàng"
+    lore:
+      - "§7Khoai tây quý hiếm với lớp vỏ"
+      - "§7vàng óng ánh kỳ diệu."
+      - ""
+      - "§7Có thể dùng để đổi vật phẩm hiếm"
+      - ""
+      - "§e✦ §7Rarity: §bRare"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  melon_concentrate:
+    material: LIME_DYE
+    display-name: "§a§lTinh Chất Dưa Hấu"
+    lore:
+      - "§7Chất lỏng xanh tươi mát được"
+      - "§7cô đặc từ vỏ những trái dưa hấu chín."
+      - ""
+      - "§7Có thể dùng để đổi đồ đặc biệt"
+      - ""
+      - "§e✦ §7Rarity: §aUncommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  pumpkin_seed_oil:
+    material: GLOW_BERRIES
+    display-name: "§6§lDầu Hạt Bí Ngô"
+    lore:
+      - "§7Dầu quý giá được ép từ"
+      - "§7hạt bí ngô chín mọng."
+      - ""
+      - "§7Có thể dùng để đổi vật phẩm đặc biệt"
+      - ""
+      - "§e✦ §7Rarity: §aUncommon"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  nether_wart_extract:
+    material: MAGENTA_DYE
+    display-name: "§5§lChiết Xuất Nether Wart"
+    lore:
+      - "§7Chiết xuất huyền bí từ cây nấm"
+      - "§7Nether mọc ở thế giới ngục."
+      - ""
+      - "§7Có thể dùng để đổi đồ hiếm"
+      - ""
+      - "§e✦ §7Rarity: §bRare"
+    enchantments:
+      LUCK: 1  # Glowing effect
+    hide-enchants: true
+
+  # Thợ Rèn Nông Cụ
+  farming_hoe_tier1:
+    material: DIAMOND_HOE
+    display-name: "§a§lCuốc Thần Nông I"
+    lore:
+      - "§7Cuốc thần thánh của Thần Nông"
+      - "§7giúp canh tác hiệu quả hơn."
+      - ""
+      - "§7Hiệu quả: §a3"
+      - "§7Chậm hỏng: §e2"
+      - "§7May mắn: §b1"
+      - ""
+      - "§e✦ §7Rarity: §bRare"
+    enchantments:
+      DURABILITY: 2
+      DIG_SPEED: 3
+      LOOT_BONUS_BLOCKS: 1
+    hide-enchants: true
+
+  farming_hoe_tier2:
+    material: NETHERITE_HOE
+    display-name: "§a§lCuốc Thần Nông II"
+    lore:
+      - "§7Cuốc thần thánh được nâng cấp"
+      - "§7với sức mạnh từ Nether."
+      - ""
+      - "§7Hiệu quả: §a4"
+      - "§7Chậm hỏng: §e3"
+      - "§7May mắn: §b2"
+      - ""
+      - "§e✦ §7Rarity: §5Epic"
+    enchantments:
+      DURABILITY: 3
+      DIG_SPEED: 4
+      LOOT_BONUS_BLOCKS: 2
+    hide-enchants: true
+
+  farming_hoe_tier3:
+    material: NETHERITE_HOE
+    display-name: "§2§lCuốc Thần Nông III"
+    custom-model-data: 400
+    lore:
+      - "§7Cuốc tối thượng của Thần Nông"
+      - "§7mang sức mạnh tuyệt đối."
+      - ""
+      - "§7Hiệu quả: §a5"
+      - "§7Bền bỉ: §e3"
+      - "§7May mắn: §b5"
+      - ""
+      - "§d§lNông cụ huyền thoại!"
+      - ""
+      - "§e✦ §7Rarity: §6Legendary"
+    enchantments:
+      DURABILITY: 3
+      DIG_SPEED: 5
+      LOOT_BONUS_BLOCKS: 5
+    hide-enchants: false
+
+
+
+
 
 
